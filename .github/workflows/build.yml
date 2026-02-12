@@ -3,9 +3,9 @@ name: CI Build Check
 # Trigger the workflow on push or pull request events for the main branch
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -23,33 +23,33 @@ jobs:
         node-version: [18.x, 20.x] # Test against current LTS versions
 
     steps:
-    # 1. Check out your code
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # 1. Check out your code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # 2. Install pnpm
-    - name: Install pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: 10
+      # 2. Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
-    # 3. Setup Node.js
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm' # Built-in caching for faster builds
+      # 3. Setup Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm" # Built-in caching for faster builds
 
-    # 4. Install Dependencies
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      # 4. Install Dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    # 5. Run Build Script
-    # Ensure you have a "build" script in your package.json
-    # - name: Run Build
-    #   run: pnpm run build
-    - name: Check Syntax
-      run: node --check src/server.js
+      # 5. Run Build Script
+      # Ensure you have a "build" script in your package.json
+      # - name: Run Build
+      #   run: pnpm run build
+      - name: Check Syntax
+        run: node --check src/server.js
 
     # 6. (Optional) Run Tests
     # - name: Run Tests
