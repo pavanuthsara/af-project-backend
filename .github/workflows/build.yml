@@ -49,7 +49,7 @@ jobs:
       # - name: Run Build
       #   run: pnpm run build
       - name: Check Syntax
-        run: node --check index.js
+        run: node --check src/infrastructure/webserver/server.js
 
       # 6. Run Unit Tests
       - name: Run Unit Tests
