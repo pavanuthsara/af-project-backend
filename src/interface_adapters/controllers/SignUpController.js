@@ -1,32 +1,34 @@
-const LoginUser = require('../../application/use_cases/LoginUser');
+const SignUpUser = require('../../application/use_cases/SignUpUser');
 const MongoUserRepository = require('../repositories/MongoUserRepository');
-const PasswordService = require('../../infrastructure/security/PasswordService');
-const JwtService = require('../../infrastructure/security/JwtService');
+// 1. Import the service
+const PasswordService = require('../../infrastructure/security/PasswordService'); 
 
-class LoginController {
+class SignUpController {
   async handle(req, res) {
     try {
-      const { email, password } = req.body;
+      const { name, email, password } = req.body;
 
-      // Dependency Injection (Wiring)
+      // 2. Instantiate the dependencies
       const userRepository = new MongoUserRepository();
-      const passwordService = new PasswordService();
-      const jwtService = new JwtService();
-      
-      const loginUseCase = new LoginUser(userRepository, passwordService, jwtService);
+      const passwordService = new PasswordService(); // <--- CREATE THIS
 
-      const { user, token } = await loginUseCase.execute(email, password);
+      // 3. INJECT IT into the Use Case
+      // The order must match your SignUpUser constructor: (repo, passwordService)
+      const signUpUseCase = new SignUpUser(userRepository, passwordService); 
 
-      return res.status(200).json({
-        message: 'Login successful',
-        token,
-        user: { id: user.id, name: user.name, email: user.email }
+      const user = await signUpUseCase.execute(name, email, password);
+
+      return res.status(201).json({
+        id: user.id,
+        name: user.name,
+        email: user.email
       });
 
     } catch (error) {
-      return res.status(401).json({ error: error.message });
+      console.log(error); // Helpful for debugging
+      return res.status(400).json({ error: error.message });
     }
   }
 }
 
-module.exports = LoginController;
+module.exports = SignUpController;
