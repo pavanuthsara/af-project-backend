@@ -1,4 +1,5 @@
 # We are using PNPM in this project
+npm install -g pnpm
 
 ## Install dependencies
 pnpm install 
