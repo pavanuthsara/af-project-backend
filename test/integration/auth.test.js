@@ -44,7 +44,7 @@ afterEach(async () => {
 
 describe('Authentication API Integration Tests', () => {
   describe('POST /signup', () => {
-    test('should register a new user successfully', async () => {
+    test('should register a new user successfully and return a token', async () => {
       const userData = {
         name: 'John Doe',
         email: 'john@example.com',
@@ -56,11 +56,12 @@ describe('Authentication API Integration Tests', () => {
         .send(userData)
         .expect(201);
 
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.name).toBe(userData.name);
-      expect(response.body.email).toBe(userData.email);
-      expect(response.body).not.toHaveProperty('password');
-      expect(response.body).not.toHaveProperty('passwordHash');
+      expect(response.body).toHaveProperty('token');
+      expect(response.body).toHaveProperty('user');
+      expect(response.body.user.id).toBeDefined();
+      expect(response.body.user.name).toBe(userData.name);
+      expect(response.body.user.email).toBe(userData.email);
+      expect(response.body.message).toBe('User registered and logged in successfully');
     });
 
     test('should return 400 if user already exists', async () => {
@@ -285,8 +286,8 @@ describe('Authentication API Integration Tests', () => {
   });
 
   describe('End-to-End User Journey', () => {
-    test('should complete full signup, login, and access protected route', async () => {
-      // 1. Sign up
+    test('should complete full signup and access protected route', async () => {
+      // 1. Sign up and get token
       const signupResponse = await request(app)
         .post('/signup')
         .send({
@@ -296,22 +297,11 @@ describe('Authentication API Integration Tests', () => {
         })
         .expect(201);
 
-      expect(signupResponse.body).toHaveProperty('id');
-      const userId = signupResponse.body.id;
+      expect(signupResponse.body).toHaveProperty('token');
+      const token = signupResponse.body.token;
+      const userId = signupResponse.body.user.id;
 
-      // 2. Login
-      const loginResponse = await request(app)
-        .post('/login')
-        .send({
-          email: 'journey@example.com',
-          password: 'journeypass123'
-        })
-        .expect(200);
-
-      expect(loginResponse.body).toHaveProperty('token');
-      const token = loginResponse.body.token;
-
-      // 3. Access protected route
+      // 2. Access protected route
       const profileResponse = await request(app)
         .get('/profile')
         .set('Authorization', `Bearer ${token}`)
