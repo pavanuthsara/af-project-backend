@@ -51,6 +51,6 @@ jobs:
       - name: Check Syntax
         run: node --check src/infrastructure/webserver/server.js
 
-      # 6. Run Unit Tests
-      - name: Run Unit Tests
-        run: pnpm run test:unit
+      # 6. Run Tests
+      - name: Run Tests
+        run: pnpm run test

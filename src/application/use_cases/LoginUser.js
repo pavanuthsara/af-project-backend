@@ -19,7 +19,7 @@ class LoginUser {
     }
 
     // 3. Generate Token
-    const token = this.jwtService.generateToken({ id: user.id, email: user.email });
+    const token = this.jwtService.generateToken({ id: user.id, email: user.email, role: user.role });
 
     return { user, token };
   }
