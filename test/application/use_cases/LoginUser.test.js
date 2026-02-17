@@ -37,7 +37,7 @@ describe('LoginUser Use Case', () => {
 
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(email);
     expect(mockPasswordService.compare).toHaveBeenCalledWith(password, user.passwordHash);
-    expect(mockJwtService.generateToken).toHaveBeenCalledWith({ id: user.id, email: user.email });
+    expect(mockJwtService.generateToken).toHaveBeenCalledWith({ id: user.id, email: user.email, role: user.role });
     expect(result.user).toBe(user);
     expect(result.token).toBe(token);
   });
@@ -77,7 +77,8 @@ describe('LoginUser Use Case', () => {
 
     expect(mockJwtService.generateToken).toHaveBeenCalledWith({
       id: 'user-456',
-      email: 'jane@example.com'
+      email: 'jane@example.com',
+      role: 'user'
     });
   });
 
