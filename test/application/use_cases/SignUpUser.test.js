@@ -29,16 +29,35 @@ describe('SignUpUser Use Case', () => {
     mockUserRepository.findByEmail.mockResolvedValue(null);
     mockPasswordService.hash.mockResolvedValue(hashedPassword);
     mockUserRepository.save.mockResolvedValue(
-      new User('123', name, email, hashedPassword)
+      new User('123', name, email, hashedPassword, 'user')
     );
 
-    const result = await signUpUser.execute(name, email, password);
+    const result = await signUpUser.execute(name, email, password, 'user');
 
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(email);
     expect(mockPasswordService.hash).toHaveBeenCalledWith(password);
     expect(mockUserRepository.save).toHaveBeenCalled();
     expect(result.name).toBe(name);
     expect(result.email).toBe(email);
+    expect(result.role).toBe('user');
+  });
+
+  test('should successfully register a new user with a specific role', async () => {
+    const name = 'Admin User';
+    const email = 'admin@example.com';
+    const password = 'password123';
+    const hashedPassword = 'hashedPassword123';
+    const role = 'admin';
+
+    mockUserRepository.findByEmail.mockResolvedValue(null);
+    mockPasswordService.hash.mockResolvedValue(hashedPassword);
+    mockUserRepository.save.mockResolvedValue(
+      new User('456', name, email, hashedPassword, role)
+    );
+
+    const result = await signUpUser.execute(name, email, password, role);
+
+    expect(result.role).toBe(role);
   });
 
   test('should throw error if user already exists', async () => {
@@ -78,10 +97,10 @@ describe('SignUpUser Use Case', () => {
     let savedUser;
     mockUserRepository.save.mockImplementation(user => {
       savedUser = user;
-      return Promise.resolve(new User('generated-id', user.name, user.email, user.passwordHash));
+      return Promise.resolve(new User('generated-id', user.name, user.email, user.passwordHash, user.role));
     });
 
-    await signUpUser.execute('John', 'john@example.com', 'password123');
+    await signUpUser.execute('John', 'john@example.com', 'password123', 'user');
 
     expect(savedUser.id).toBeNull();
   });

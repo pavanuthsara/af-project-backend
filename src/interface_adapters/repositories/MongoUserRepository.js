@@ -8,14 +8,15 @@ class MongoUserRepository extends UserRepository {
       name: user.name,
       email: user.email,
       password: user.passwordHash,
+      role: user.role,
     });
-    return new User(mongoUser._id.toString(), mongoUser.name, mongoUser.email, mongoUser.password);
+    return new User(mongoUser._id.toString(), mongoUser.name, mongoUser.email, mongoUser.password, mongoUser.role);
   }
 
   async findByEmail(email) {
     const mongoUser = await UserModel.findOne({ email });
     if (!mongoUser) return null;
-    return new User(mongoUser._id.toString(), mongoUser.name, mongoUser.email, mongoUser.password);
+    return new User(mongoUser._id.toString(), mongoUser.name, mongoUser.email, mongoUser.password, mongoUser.role);
   }
 }
 
