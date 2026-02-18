@@ -1,33 +1,14 @@
 const WasteCategory = require('../../interface_adapters/schemas/WasteCategory');
 const WasteItem = require('../../interface_adapters/schemas/WasteItem');
 
-/**
- * WasteService
- * Service layer for handling business logic related to waste categories and items.
- * Implements CRUD operations with pagination, filtering, and search capabilities.
- */
-class WasteService {
-  // ============================================
-  // WASTE CATEGORY OPERATIONS
-  // ============================================
 
-  /**
-   * Create a new waste category
-   * @param {Object} categoryData - Category data (name, description, recyclable, hazardous, compostable)
-   * @returns {Object} Created category
-   */
+class WasteService {
+  
   async createCategory(categoryData) {
     const category = new WasteCategory(categoryData);
     return await category.save();
   }
 
-  /**
-   * Get all categories with pagination
-   * @param {Object} options - Pagination options
-   * @param {number} options.page - Page number (default: 1)
-   * @param {number} options.limit - Items per page (default: 10)
-   * @returns {Object} Paginated results with categories and metadata
-   */
   async getCategories({ page = 1, limit = 10 }) {
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
@@ -54,11 +35,6 @@ class WasteService {
     };
   }
 
-  /**
-   * Get a single category by ID
-   * @param {string} id - Category ID
-   * @returns {Object} Category document
-   */
   async getCategoryById(id) {
     const category = await WasteCategory.findById(id);
     if (!category) {
@@ -69,12 +45,7 @@ class WasteService {
     return category;
   }
 
-  /**
-   * Update a category by ID
-   * @param {string} id - Category ID
-   * @param {Object} updateData - Data to update
-   * @returns {Object} Updated category
-   */
+  
   async updateCategory(id, updateData) {
     // Check if category exists
     const category = await WasteCategory.findById(id);
@@ -94,11 +65,7 @@ class WasteService {
     return updatedCategory;
   }
 
-  /**
-   * Delete a category by ID
-   * @param {string} id - Category ID
-   * @returns {Object} Deleted category
-   */
+  
   async deleteCategory(id) {
     const category = await WasteCategory.findByIdAndDelete(id);
     if (!category) {
@@ -106,23 +73,12 @@ class WasteService {
       error.statusCode = 404;
       throw error;
     }
-    
-    // Optionally: Delete all waste items associated with this category
-    // This maintains referential integrity
     await WasteItem.deleteMany({ category: id });
     
     return category;
   }
 
-  // ============================================
-  // WASTE ITEM OPERATIONS
-  // ============================================
-
-  /**
-   * Create a new waste item
-   * @param {Object} itemData - Item data (name, description, category, disposalInstructions, etc.)
-   * @returns {Object} Created item with populated category
-   */
+  
   async createWasteItem(itemData) {
     // Verify that the category exists before creating the item
     const category = await WasteCategory.findById(itemData.category);
@@ -139,18 +95,7 @@ class WasteService {
     return await WasteItem.findById(savedItem._id).populate('category');
   }
 
-  /**
-   * Get all waste items with pagination, filtering, and search
-   * @param {Object} options - Query options
-   * @param {number} options.page - Page number (default: 1)
-   * @param {number} options.limit - Items per page (default: 10)
-   * @param {string} options.search - Search term for name (case-insensitive)
-   * @param {string} options.category - Filter by category ID
-   * @param {boolean} options.recyclable - Filter by recyclable status
-   * @param {boolean} options.hazardous - Filter by hazardous status
-   * @param {boolean} options.compostable - Filter by compostable status
-   * @returns {Object} Paginated results with items and metadata
-   */
+  
   async getWasteItems({ 
     page = 1, 
     limit = 10, 
@@ -172,9 +117,7 @@ class WasteService {
     if (category && category.trim()) {
       query.category = category.trim();
     }
-    
-    // Boolean filters: only add if explicitly provided
-    // Using $eq operator for clarity with boolean values
+ 
     if (recyclable !== undefined && recyclable !== '') {
       query.recyclable = { $eq: recyclable === 'true' || recyclable === true };
     }
@@ -213,11 +156,7 @@ class WasteService {
     };
   }
 
-  /**
-   * Get a single waste item by ID
-   * @param {string} id - Item ID
-   * @returns {Object} Item document with populated category
-   */
+  
   async getWasteItemById(id) {
     const item = await WasteItem.findById(id).populate('category');
     if (!item) {
@@ -228,12 +167,7 @@ class WasteService {
     return item;
   }
 
-  /**
-   * Update a waste item by ID
-   * @param {string} id - Item ID
-   * @param {Object} updateData - Data to update
-   * @returns {Object} Updated item with populated category
-   */
+  
   async updateWasteItem(id, updateData) {
     // If category is being updated, verify it exists
     if (updateData.category) {
@@ -263,11 +197,7 @@ class WasteService {
     return updatedItem;
   }
 
-  /**
-   * Delete a waste item by ID
-   * @param {string} id - Item ID
-   * @returns {Object} Deleted item
-   */
+  
   async deleteWasteItem(id) {
     const item = await WasteItem.findByIdAndDelete(id);
     if (!item) {
