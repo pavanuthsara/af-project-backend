@@ -4,6 +4,7 @@ const SignUpController = require('../../interface_adapters/controllers/SignUpCon
 const LoginController = require('../../interface_adapters/controllers/LoginController');
 const AdminLoginController = require('../../interface_adapters/controllers/AdminLoginController');
 const RegisterAdminController = require('../../interface_adapters/controllers/RegisterAdminController');
+const NearestCentersController = require('../../interface_adapters/controllers/NearestCentersController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
@@ -18,11 +19,15 @@ const signUpController = new SignUpController();
 const loginController = new LoginController();
 const adminLoginController = new AdminLoginController();
 const registerAdminController = new RegisterAdminController();
+const nearestCentersController = new NearestCentersController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
 app.post('/login', (req, res) => loginController.handle(req, res));
 app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
+
+// --- CENTER ROUTES ---
+app.get('/api/centers/nearest', (req, res) => nearestCentersController.handle(req, res));
 
 // --- ADMIN PROTECTED ROUTES ---
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));

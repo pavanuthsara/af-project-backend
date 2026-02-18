@@ -137,3 +137,51 @@ Authentication is handled using JSON Web Tokens (JWT). When you log in, you will
     6.  Go to the "Body" tab, select "raw", and choose "JSON".
     7.  Paste the request body JSON.
     8.  Click "Send".
+
+## Center Endpoints
+
+### Find Nearest Centers
+
+*   **Method:** `GET`
+*   **URL:** `/api/centers/nearest?lat=<LATITUDE>&long=<LONGITUDE>`
+*   **Description:** Finds centers within 5km of the specified coordinates using geospatial queries.
+*   **Query Parameters:**
+    *   `lat` (required): Latitude of the user's location (e.g., 40.7128)
+    *   `long` (required): Longitude of the user's location (e.g., -74.0060)
+
+*   **Response:**
+
+    ```json
+    {
+      "success": true,
+      "count": 2,
+      "centers": [
+        {
+          "id": "507f1f77bcf86cd799439011",
+          "name": "Downtown Center",
+          "address": "123 Main St, New York, NY",
+          "location": {
+            "type": "Point",
+            "coordinates": [-74.0060, 40.7128]
+          },
+          "contactInfo": {
+            "phone": "123-456-7890",
+            "email": "downtown@example.com"
+          }
+        }
+      ]
+    }
+    ```
+
+*   **Postman Instructions:**
+    1.  Open Postman.
+    2.  Set the request method to `GET`.
+    3.  Enter the URL: `http://localhost:3000/api/centers/nearest?lat=40.7128&long=-74.0060`.
+    4.  Click "Send".
+
+*   **Technical Details:**
+    *   Uses MongoDB's `$near` operator with GeoJSON
+    *   Requires a 2dsphere index on the `location` field (automatically created)
+    *   Distance calculation is based on spherical geometry
+    *   Maximum distance: 5km (5000 meters)
+    *   Coordinates format: GeoJSON Point `[longitude, latitude]`
