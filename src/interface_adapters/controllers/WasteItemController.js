@@ -1,20 +1,10 @@
 const WasteService = require('../../application/services/WasteService');
 
-/**
- * WasteItemController
- * Handles HTTP requests related to waste items.
- * Calls the service layer for business logic and returns appropriate HTTP responses.
- */
 class WasteItemController {
   constructor() {
     this.wasteService = new WasteService();
   }
 
-  /**
-   * Create a new waste item
-   * POST /api/items
-   * Admin only - requires authentication and admin role
-   */
   createWasteItem = async (req, res, next) => {
     try {
       const { 
@@ -54,11 +44,6 @@ class WasteItemController {
     }
   };
 
-  /**
-   * Get all waste items with pagination, filtering, and search
-   * GET /api/items?page=1&limit=10&search=plastic&category=xxx&recyclable=true
-   * Public route - no authentication required
-   */
   getWasteItems = async (req, res, next) => {
     try {
       // Extract query parameters for pagination, search, and filtering
@@ -94,11 +79,7 @@ class WasteItemController {
     }
   };
 
-  /**
-   * Get a single waste item by ID
-   * GET /api/items/:id
-   * Public route - no authentication required
-   */
+  
   getWasteItemById = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -116,11 +97,7 @@ class WasteItemController {
     }
   };
 
-  /**
-   * Update a waste item by ID
-   * PUT /api/items/:id
-   * Admin only - requires authentication and admin role
-   */
+
   updateWasteItem = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -145,11 +122,6 @@ class WasteItemController {
     }
   };
 
-  /**
-   * Delete a waste item by ID
-   * DELETE /api/items/:id
-   * Admin only - requires authentication and admin role
-   */
   deleteWasteItem = async (req, res, next) => {
     try {
       const { id } = req.params;
