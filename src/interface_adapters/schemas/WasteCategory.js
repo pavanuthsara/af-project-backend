@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 
-/**
- * WasteCategory Schema
- * Represents a category for classifying waste items
- * (e.g., Plastic, Paper, Organic, Hazardous)
- */
 const WasteCategorySchema = new mongoose.Schema({
-  // Name of the waste category - must be unique and is indexed for fast lookups
+  
   name: {
     type: String,
     required: [true, 'Category name is required'],
