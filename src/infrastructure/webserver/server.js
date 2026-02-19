@@ -4,6 +4,7 @@ const SignUpController = require('../../interface_adapters/controllers/SignUpCon
 const LoginController = require('../../interface_adapters/controllers/LoginController');
 const AdminLoginController = require('../../interface_adapters/controllers/AdminLoginController');
 const RegisterAdminController = require('../../interface_adapters/controllers/RegisterAdminController');
+const RegisterRecyclingCenterController = require('../../interface_adapters/controllers/RegisterRecyclingCenterController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
@@ -18,6 +19,7 @@ const signUpController = new SignUpController();
 const loginController = new LoginController();
 const adminLoginController = new AdminLoginController();
 const registerAdminController = new RegisterAdminController();
+const registerRecyclingCenterController = new RegisterRecyclingCenterController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -26,6 +28,7 @@ app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 
 // --- ADMIN PROTECTED ROUTES ---
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
+app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 
 // Start server
 const PORT = process.env.PORT || 3000;
