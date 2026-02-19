@@ -100,17 +100,18 @@ class WasteService {
    * @returns {Object} Deleted category
    */
   async deleteCategory(id) {
+    // Delete all waste items associated with this category first
+    // This helps maintain referential integrity in case of errors
+    await WasteItem.deleteMany({ category: id });
+
+    // Then delete the category itself
     const category = await WasteCategory.findByIdAndDelete(id);
     if (!category) {
       const error = new Error('Category not found');
       error.statusCode = 404;
       throw error;
     }
-    
-    // Optionally: Delete all waste items associated with this category
-    // This maintains referential integrity
-    await WasteItem.deleteMany({ category: id });
-    
+
     return category;
   }
 
