@@ -37,13 +37,7 @@ class MongoUserRepository extends UserRepository {
   async findByEmail(email) {
     const mongoUser = await UserModel.findOne({ email });
     if (!mongoUser) return null;
-    return new User(
-      mongoUser._id.toString(), 
-      mongoUser.name, 
-      mongoUser.email, 
-      mongoUser.password,
-      mongoUser.role // Include role when retrieving
-    );
+    return new User(mongoUser._id.toString(), mongoUser.name, mongoUser.email, mongoUser.password, mongoUser.role);
   }
 }
 

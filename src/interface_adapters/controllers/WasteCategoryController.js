@@ -1,20 +1,12 @@
 const WasteService = require('../../application/services/WasteService');
 
-/**
- * WasteCategoryController
- * Handles HTTP requests related to waste categories.
- * Calls the service layer for business logic and returns appropriate HTTP responses.
- */
+
 class WasteCategoryController {
   constructor() {
     this.wasteService = new WasteService();
   }
 
-  /**
-   * Create a new waste category
-   * POST /api/categories
-   * Admin only - requires authentication and admin role
-   */
+
   createCategory = async (req, res, next) => {
     try {
       const { name, description, recyclable, hazardous, compostable } = req.body;
@@ -44,11 +36,7 @@ class WasteCategoryController {
     }
   };
 
-  /**
-   * Get all categories with pagination
-   * GET /api/categories?page=1&limit=10
-   * Public route - no authentication required
-   */
+  
   getCategories = async (req, res, next) => {
     try {
       // Extract pagination parameters from query string
@@ -71,11 +59,7 @@ class WasteCategoryController {
     }
   };
 
-  /**
-   * Get a single category by ID
-   * GET /api/categories/:id
-   * Public route - no authentication required
-   */
+  
   getCategoryById = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -93,11 +77,7 @@ class WasteCategoryController {
     }
   };
 
-  /**
-   * Update a category by ID
-   * PUT /api/categories/:id
-   * Admin only - requires authentication and admin role
-   */
+  
   updateCategory = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -122,17 +102,12 @@ class WasteCategoryController {
     }
   };
 
-  /**
-   * Delete a category by ID
-   * DELETE /api/categories/:id
-   * Admin only - requires authentication and admin role
-   */
+ 
   deleteCategory = async (req, res, next) => {
     try {
       const { id } = req.params;
       
       // Delete category through service
-      // Note: This will also delete all waste items in this category
       const deletedCategory = await this.wasteService.deleteCategory(id);
       
       // Return success response

@@ -1,14 +1,4 @@
-/**
- * Authorization Middleware
- * Restricts access to routes based on user roles.
- * Must be used after the authMiddleware (which attaches req.user)
- */
 
-/**
- * Creates a middleware function that checks if the user has the required role
- * @param {...string} roles - Roles that are allowed to access the route
- * @returns {Function} Express middleware function
- */
 const authorize = (...roles) => {
   return (req, res, next) => {
     // Check if user exists on request (set by authMiddleware)

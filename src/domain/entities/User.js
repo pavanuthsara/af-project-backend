@@ -9,7 +9,7 @@ class User {
     this.name = name;
     this.email = email;
     this.passwordHash = passwordHash;
-    this.role = role; // 'user' or 'admin' - used for authorization
+    this.role = role;
   }
 }
 

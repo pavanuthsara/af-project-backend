@@ -5,8 +5,7 @@ const connectToDatabase = async () => {
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
-    console.error('MONGO_URI is not defined in .env');
-    process.exit(1);
+    throw new Error('MONGO_URI is not defined in .env');
   }
 
   try {
@@ -14,7 +13,7 @@ const connectToDatabase = async () => {
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error('Database connection failed:', error);
-    process.exit(1);
+    throw error;
   }
 };
 

@@ -18,13 +18,8 @@ class LoginUser {
       throw new Error('Invalid credentials');
     }
 
-    // 3. Generate Token with user role for authorization
-    // Role is included so authorize middleware can check permissions
-    const token = this.jwtService.generateToken({ 
-      id: user.id, 
-      email: user.email,
-      role: user.role || 'user' // Include role for authorization
-    });
+    // 3. Generate Token
+    const token = this.jwtService.generateToken({ id: user.id, email: user.email, role: user.role });
 
     return { user, token };
   }
