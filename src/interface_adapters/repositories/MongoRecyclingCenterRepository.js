@@ -32,6 +32,11 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     return this.toEntity(mongoRecyclingCenter);
   }
 
+  async deleteById(id) {
+    const deletedCenter = await RecyclingCenterModel.findByIdAndDelete(id);
+    return Boolean(deletedCenter);
+  }
+
   toEntity(mongoRecyclingCenter) {
     return new RecyclingCenter(
       mongoRecyclingCenter._id.toString(),
