@@ -137,3 +137,18 @@ Authentication is handled using JSON Web Tokens (JWT). When you log in, you will
     6.  Go to the "Body" tab, select "raw", and choose "JSON".
     7.  Paste the request body JSON.
     8.  Click "Send".
+
+### Delete Recycling Center
+
+*   **Method:** `DELETE`
+*   **URL:** `/admin/recycling-centers/:id`
+*   **Description:** Deletes a recycling center by ID. This is a protected route and requires an admin JWT.
+*   **Request Params:**
+    *   `id` (MongoDB ObjectId)
+*   **Response:**
+    *   `204 No Content` on success
+*   **Error Responses:**
+    *   `400` Invalid recycling center id
+    *   `401` Access denied. No token provided / Invalid token
+    *   `403` Forbidden: Not an admin
+    *   `404` Recycling center not found
