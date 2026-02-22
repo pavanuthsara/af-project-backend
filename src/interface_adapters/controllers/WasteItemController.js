@@ -10,9 +10,7 @@ class WasteItemController {
     const missingFields = requiredFields.filter(field => !data[field]);
     
     if (missingFields.length > 0) {
-      const error = new Error(`Missing required fields: ${missingFields.join(', ')}`);
-      error.statusCode = 400;
-      throw error;
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
     }
   };
 
@@ -28,7 +26,8 @@ class WasteItemController {
         compostable 
       } = req.body;
       
-      // Create item through service layer
+      this.validateWasteItemInput({ name, category, disposalInstructions });
+      
       const item = await this.wasteService.createWasteItem({
         name,
         description,
@@ -39,7 +38,6 @@ class WasteItemController {
         compostable: compostable || false
       });
       
-      // Return success response with 201 Created status
       res.status(201).json({
         success: true,
         data: item
@@ -51,7 +49,6 @@ class WasteItemController {
 
   getWasteItems = async (req, res, next) => {
     try {
-      // Extract query parameters for pagination, search, and filtering
       const { 
         page, 
         limit, 
@@ -62,7 +59,6 @@ class WasteItemController {
         compostable 
       } = req.query;
       
-      // Get paginated and filtered items from service
       const result = await this.wasteService.getWasteItems({
         page: Math.max(1, parseInt(page) || 1),
         limit: Math.max(1, Math.min(100, parseInt(limit) || 10)),
@@ -73,7 +69,6 @@ class WasteItemController {
         compostable
       });
       
-      // Return success response
       res.status(200).json({
         success: true,
         data: result.items,
@@ -84,15 +79,11 @@ class WasteItemController {
     }
   };
 
-  
   getWasteItemById = async (req, res, next) => {
     try {
       const { id } = req.params;
-      
-      // Get item from service
       const item = await this.wasteService.getWasteItemById(id);
       
-      // Return success response
       res.status(200).json({
         success: true,
         data: item
@@ -102,16 +93,11 @@ class WasteItemController {
     }
   };
 
-
   updateWasteItem = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const updateData = req.body;
+      const updatedItem = await this.wasteService.updateWasteItem(id, req.body);
       
-      // Update item through service
-      const updatedItem = await this.wasteService.updateWasteItem(id, updateData);
-      
-      // Return success response
       res.status(200).json({
         success: true,
         data: updatedItem
@@ -124,11 +110,8 @@ class WasteItemController {
   deleteWasteItem = async (req, res, next) => {
     try {
       const { id } = req.params;
-      
-      // Delete item through service
       const deletedItem = await this.wasteService.deleteWasteItem(id);
       
-      // Return success response
       res.status(200).json({
         success: true,
         data: deletedItem,
