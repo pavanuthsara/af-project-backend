@@ -117,12 +117,6 @@ class WasteItemController {
         data: updatedItem
       });
     } catch (error) {
-      // Handle validation errors
-      if (error.name === 'ValidationError') {
-        const validationError = new Error(Object.values(error.errors).map(e => e.message).join(', '));
-        validationError.statusCode = 400;
-        next(validationError);
-      }
       next(error);
     }
   };
