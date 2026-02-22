@@ -64,8 +64,8 @@ class WasteItemController {
       
       // Get paginated and filtered items from service
       const result = await this.wasteService.getWasteItems({
-        page: parseInt(page) || 1,
-        limit: parseInt(limit) || 10,
+        page: Math.max(1, parseInt(page) || 1),
+        limit: Math.max(1, Math.min(100, parseInt(limit) || 10)),
         search,
         category,
         recyclable,
