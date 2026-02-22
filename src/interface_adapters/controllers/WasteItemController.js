@@ -5,6 +5,17 @@ class WasteItemController {
     this.wasteService = new WasteService();
   }
 
+  validateWasteItemInput = (data) => {
+    const requiredFields = ['name', 'category', 'disposalInstructions'];
+    const missingFields = requiredFields.filter(field => !data[field]);
+    
+    if (missingFields.length > 0) {
+      const error = new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      error.statusCode = 400;
+      throw error;
+    }
+  };
+
   createWasteItem = async (req, res, next) => {
     try {
       const { 
@@ -34,12 +45,6 @@ class WasteItemController {
         data: item
       });
     } catch (error) {
-      // Handle validation errors
-      if (error.name === 'ValidationError') {
-        const validationError = new Error(Object.values(error.errors).map(e => e.message).join(', '));
-        validationError.statusCode = 400;
-        return next(validationError);
-      }
       next(error);
     }
   };
