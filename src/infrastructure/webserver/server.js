@@ -83,22 +83,6 @@ const startServer = async () => {
     // Exit with failure code so hosting environments know it crashed
     process.exit(1); 
   }
-  
-  // Handle duplicate key errors
-  if (error.code === 11000) {
-    return res.status(400).json({
-      success: false,
-      error: 'Duplicate key error - resource already exists'
-    });
-  }
-  
-  // Use custom status code if set, otherwise default to 500
-  const statusCode = error.statusCode || 500;
-  
-  res.status(statusCode).json({
-    success: false,
-    error: error.message || 'Internal Server Error'
-  });
-});
+};
 
 startServer();
