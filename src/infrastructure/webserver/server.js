@@ -9,6 +9,10 @@ const DeleteRecyclingCenterController = require('../../interface_adapters/contro
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
+// Import waste management routes
+const categoryRoutes = require('../../interface_adapters/routes/categoryRoutes');
+const itemRoutes = require('../../interface_adapters/routes/itemRoutes');
+
 // Load environment variables
 require('dotenv').config();
 

@@ -1,3 +1,8 @@
+/**
+ * User Entity
+ * Domain entity representing a user in the system.
+ * Includes role for authorization purposes.
+ */
 class User {
   constructor(id, name, email, passwordHash, role = 'user') {
     this.id = id;
