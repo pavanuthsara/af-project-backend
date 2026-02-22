@@ -4,6 +4,9 @@ const SignUpController = require('../../interface_adapters/controllers/SignUpCon
 const LoginController = require('../../interface_adapters/controllers/LoginController');
 const AdminLoginController = require('../../interface_adapters/controllers/AdminLoginController');
 const RegisterAdminController = require('../../interface_adapters/controllers/RegisterAdminController');
+const RegisterTruckController = require('../../interface_adapters/controllers/RegisterTruckController');
+const RegisterDriverController = require('../../interface_adapters/controllers/RegisterDriverController');
+const AssignDriverToTruckController = require('../../interface_adapters/controllers/AssignDriverToTruckController');
 const RegisterRecyclingCenterController = require('../../interface_adapters/controllers/RegisterRecyclingCenterController');
 const DeleteRecyclingCenterController = require('../../interface_adapters/controllers/DeleteRecyclingCenterController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
@@ -20,6 +23,9 @@ const signUpController = new SignUpController();
 const loginController = new LoginController();
 const adminLoginController = new AdminLoginController();
 const registerAdminController = new RegisterAdminController();
+const registerTruckController = new RegisterTruckController();
+const registerDriverController = new RegisterDriverController();
+const assignDriverToTruckController = new AssignDriverToTruckController();
 const registerRecyclingCenterController = new RegisterRecyclingCenterController();
 const deleteRecyclingCenterController = new DeleteRecyclingCenterController();
 
@@ -30,6 +36,9 @@ app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 
 // --- ADMIN PROTECTED ROUTES ---
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
+app.post('/admin/trucks', adminAuthMiddleware, (req, res) => registerTruckController.handle(req, res));
+app.post('/admin/drivers', adminAuthMiddleware, (req, res) => registerDriverController.handle(req, res));
+app.post('/admin/trucks/assign-driver', adminAuthMiddleware, (req, res) => assignDriverToTruckController.handle(req, res));
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => deleteRecyclingCenterController.handle(req, res));
 
