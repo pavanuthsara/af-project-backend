@@ -121,7 +121,7 @@ class WasteItemController {
       if (error.name === 'ValidationError') {
         const validationError = new Error(Object.values(error.errors).map(e => e.message).join(', '));
         validationError.statusCode = 400;
-        return next(validationError);
+        next(validationError);
       }
       next(error);
     }
