@@ -1,5 +1,5 @@
-const GetUserWasteStats = require('../../application/use_cases/GetUserWasteStats');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
+const GetUserWasteStats = require('../../../application/use_cases/GetUserWasteStats');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
 
 class GetUserWasteStatsController {
   async handle(req, res) {

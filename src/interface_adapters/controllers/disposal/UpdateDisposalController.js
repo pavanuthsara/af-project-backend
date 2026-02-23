@@ -1,6 +1,6 @@
-const UpdateDisposalLog = require('../../application/use_cases/UpdateDisposalLog');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
-const MongoWasteRepository = require('../repositories/MongoWasteRepository');
+const UpdateDisposalLog = require('../../../application/use_cases/UpdateDisposalLog');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
+const MongoWasteItemRepository = require('../../repositories/MongoWasteItemRepository');
 
 class UpdateDisposalController {
   async handle(req, res) {
@@ -10,8 +10,8 @@ class UpdateDisposalController {
       const updates = req.body;
 
       const disposalActivityRepository = new MongoDisposalActivityRepository();
-      const wasteRepository = new MongoWasteRepository();
-      const updateDisposalLogUseCase = new UpdateDisposalLog(disposalActivityRepository, wasteRepository);
+      const wasteItemRepository = new MongoWasteItemRepository();
+      const updateDisposalLogUseCase = new UpdateDisposalLog(disposalActivityRepository, wasteItemRepository);
 
       const updatedLog = await updateDisposalLogUseCase.execute(id, userId, updates);
 

@@ -1,7 +1,7 @@
 class UpdateDisposalLog {
-  constructor(disposalActivityRepository, wasteRepository) {
+  constructor(disposalActivityRepository, wasteItemRepository) {
     this.disposalActivityRepository = disposalActivityRepository;
-    this.wasteRepository = wasteRepository;
+    this.wasteItemRepository = wasteItemRepository;
   }
 
   async execute(logId, userId, updates) {
@@ -30,9 +30,9 @@ class UpdateDisposalLog {
     }
 
     if (updates.wasteId) {
-      const wasteExists = await this.wasteRepository.findById(updates.wasteId);
-      if (!wasteExists) {
-        throw new Error('Invalid waste ID');
+      const wasteItem = await this.wasteItemRepository.findById(updates.wasteId);
+      if (!wasteItem) {
+        throw new Error('Invalid waste item ID');
       }
     }
 

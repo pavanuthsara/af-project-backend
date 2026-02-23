@@ -1,5 +1,5 @@
-const DeleteDisposalLog = require('../../application/use_cases/DeleteDisposalLog');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
+const DeleteDisposalLog = require('../../../application/use_cases/DeleteDisposalLog');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
 
 class DeleteDisposalController {
   async handle(req, res) {

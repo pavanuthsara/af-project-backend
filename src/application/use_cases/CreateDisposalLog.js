@@ -1,7 +1,7 @@
 class CreateDisposalLog {
-  constructor(disposalActivityRepository, wasteRepository) {
+  constructor(disposalActivityRepository, wasteItemRepository) {
     this.disposalActivityRepository = disposalActivityRepository;
-    this.wasteRepository = wasteRepository;
+    this.wasteItemRepository = wasteItemRepository;
   }
 
   async execute(userId, wasteId, quantity, weight, unit) {
@@ -10,10 +10,10 @@ class CreateDisposalLog {
       throw new Error('All fields are required');
     }
 
-    // Verify that the waste exists
-    const wasteExists = await this.wasteRepository.findById(wasteId);
-    if (!wasteExists) {
-      throw new Error('Invalid waste type: Waste ID does not exist');
+    // Verify that the waste item exists
+    const wasteItem = await this.wasteItemRepository.findById(wasteId);
+    if (!wasteItem) {
+      throw new Error('Invalid waste item: Waste ID does not exist');
     }
 
     if (quantity <= 0 || weight <= 0) {

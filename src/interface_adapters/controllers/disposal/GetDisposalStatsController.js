@@ -1,5 +1,5 @@
-const GetAggregatedStats = require('../../application/use_cases/GetAggregatedStats');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
+const GetAggregatedStats = require('../../../application/use_cases/GetAggregatedStats');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
 
 class GetDisposalStatsController {
   async handle(req, res) {

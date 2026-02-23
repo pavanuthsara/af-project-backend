@@ -1,5 +1,5 @@
-const GetUserDisposalHistory = require('../../application/use_cases/GetUserDisposalHistory');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
+const GetUserDisposalHistory = require('../../../application/use_cases/GetUserDisposalHistory');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
 
 class GetDisposalHistoryController {
   async handle(req, res) {

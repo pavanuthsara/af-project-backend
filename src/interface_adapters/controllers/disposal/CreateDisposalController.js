@@ -1,6 +1,6 @@
-const CreateDisposalLog = require('../../application/use_cases/CreateDisposalLog');
-const MongoDisposalActivityRepository = require('../repositories/MongoDisposalActivityRepository');
-const MongoWasteRepository = require('../repositories/MongoWasteRepository');
+const CreateDisposalLog = require('../../../application/use_cases/CreateDisposalLog');
+const MongoDisposalActivityRepository = require('../../repositories/MongoDisposalActivityRepository');
+const MongoWasteItemRepository = require('../../repositories/MongoWasteItemRepository');
 
 class CreateDisposalController {
   async handle(req, res) {
@@ -9,8 +9,8 @@ class CreateDisposalController {
       const userId = req.user.id; // From auth middleware
 
       const disposalActivityRepository = new MongoDisposalActivityRepository();
-      const wasteRepository = new MongoWasteRepository();
-      const createDisposalLogUseCase = new CreateDisposalLog(disposalActivityRepository, wasteRepository);
+      const wasteItemRepository = new MongoWasteItemRepository();
+      const createDisposalLogUseCase = new CreateDisposalLog(disposalActivityRepository, wasteItemRepository);
 
       const disposalLog = await createDisposalLogUseCase.execute(
         userId,
