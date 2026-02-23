@@ -10,7 +10,7 @@ const DisposalActivitySchema = new mongoose.Schema(
     },
     wasteId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Waste',
+      ref: 'WasteItem',
       required: [true, 'Waste ID is required'],
       index: true
     },
