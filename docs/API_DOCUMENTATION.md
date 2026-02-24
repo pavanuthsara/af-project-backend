@@ -25,126 +25,13 @@ Create a Postman environment with these variables:
 | `token` | (obtained from login) | JWT authentication token |
 | `categoryId` | (created category ID) | For testing item endpoints |
 
----
 
-## Authentication Endpoints
 
-### 1. Sign Up (Create User)
-**POST** `/signup`
-
-Creates a new user account.
-
-> **Note:** The auth routes are at the root level, not under `/api`.
-
-#### Request Body (JSON):
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Response (201 Created):
-```json
-{
-  "message": "User created successfully",
-  "user": {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "user"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
----
-
-### 2. Sign Up Admin User
-**POST** `/signup`
-
-To create an admin user (for testing protected routes), you'll need to manually update the user's role in the database or modify the signup process temporarily.
-
-#### Request Body (JSON):
-```json
-{
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "password": "admin123"
-}
-```
-
-> **Note:** After creating an admin user, manually update their role in MongoDB:
-> ```javascript
-> db.users.updateOne(
->   { email: "admin@example.com" },
->   { $set: { role: "admin" } }
-> )
-> ```
-
----
-
-### 3. Login
-**POST** `/login`
-
-Authenticates a user and returns a JWT token.
-
-#### Request Body (JSON):
-```json
-{
-  "email": "admin@example.com",
-  "password": "admin123"
-}
-```
-
-#### Response (200 OK):
-```json
-{
-  "message": "Login successful",
-  "user": {
-    "id": "67a1b2c3d4e5f6g7h8i9j0k1",
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "role": "admin"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-> **Important:** Copy the `token` value for use in protected routes. Save it to your Postman environment variable `token`.
-
----
-
-### 4. Get Profile (Protected Route)
-**GET** `/profile`
-
-Returns the authenticated user's profile.
-
-#### Headers:
-| Key | Value |
-|-----|-------|
-| `Authorization` | `Bearer {{token}}` |
-
-#### Response (200 OK):
-```json
-{
-  "message": "This is a protected route",
-  "user": {
-    "id": "67a1b2c3d4e5f6g7h8i9j0k1",
-    "email": "admin@example.com",
-    "role": "admin",
-    "iat": 1706000000,
-    "exp": 1706003600
-  }
-}
-```
-
----
 
 ## Category Endpoints
 
 ### 1. Create Category (Admin Only)
-**POST** `/api/categories`
+**POST** `/categories`
 
 Creates a new waste category.
 
@@ -187,7 +74,7 @@ Creates a new waste category.
 ---
 
 ### 2. Get All Categories (Public)
-**GET** `/api/categories`
+**GET** `/categories`
 
 Returns all categories with pagination.
 
@@ -199,7 +86,7 @@ Returns all categories with pagination.
 
 #### Example Request:
 ```
-GET /api/categories?page=1&limit=10
+GET /categories?page=1&limit=10
 ```
 
 #### Response (200 OK):
@@ -232,7 +119,7 @@ GET /api/categories?page=1&limit=10
 ---
 
 ### 3. Get Category by ID (Public)
-**GET** `/api/categories/:id`
+**GET** `/categories/:id`
 
 Returns a single category by its ID.
 
@@ -261,7 +148,7 @@ GET /api/categories/67a1b2c3d4e5f6g7h8i9j0k2
 ---
 
 ### 4. Update Category (Admin Only)
-**PUT** `/api/categories/:id`
+**PUT** `/categories/:id`
 
 Updates an existing category.
 
@@ -299,7 +186,7 @@ Updates an existing category.
 ---
 
 ### 5. Delete Category (Admin Only)
-**DELETE** `/api/categories/:id`
+**DELETE** `/categories/:id`
 
 Deletes a category and all associated waste items.
 
@@ -326,7 +213,7 @@ Deletes a category and all associated waste items.
 ## Waste Item Endpoints
 
 ### 1. Create Waste Item (Admin Only)
-**POST** `/api/items`
+**POST** `/items`
 
 Creates a new waste item.
 
