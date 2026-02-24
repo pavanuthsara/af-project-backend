@@ -260,7 +260,7 @@ Creates a new waste item.
 ---
 
 ### 2. Get All Waste Items (Public)
-**GET** `/api/items`
+**GET** `/items`
 
 Returns all waste items with pagination, filtering, and search.
 
@@ -337,7 +337,7 @@ GET /api/items?search=plastic&recyclable=true&hazardous=false&page=1&limit=20
 ---
 
 ### 3. Get Waste Item by ID (Public)
-**GET** `/api/items/:id`
+**GET** `/items/:id`
 
 Returns a single waste item by its ID.
 
@@ -414,7 +414,7 @@ Updates an existing waste item.
 ---
 
 ### 5. Delete Waste Item (Admin Only)
-**DELETE** `/api/items/:id`
+**DELETE** `/items/:id`
 
 Deletes a waste item.
 
