@@ -481,6 +481,92 @@ Deletes a waste item.
 
 ---
 
+## KB-03: Search for Waste Items by Keywords
+
+This feature allows citizens to quickly search for waste items by keywords to find out how to dispose of a specific object. The search is case-insensitive and matches item names and descriptions.
+
+### Search Examples
+
+#### 1. Basic keyword search by item name
+**Request:**
+```
+GET /items?search=bottle
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67a1b2c3d4e5f6g7h8i9j0k3",
+      "name": "Plastic Water Bottle",
+      "description": "Empty PET plastic water bottle",
+      "category": {
+        "_id": "67a1b2c3d4e5f6g7h8i9j0k2",
+        "name": "Plastic",
+        "description": "Various types of plastic materials"
+      },
+      "recyclable": true,
+      "hazardous": false,
+      "compostable": false,
+      "createdAt": "2026-02-15T07:00:00.000Z",
+      "updatedAt": "2026-02-15T07:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalItems": 1,
+    "itemsPerPage": 10,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}
+```
+
+#### 2. Search with recyclable filter
+**Request:**
+```
+GET /items?search=plastic&recyclable=true
+```
+
+**Expected Result:** All recyclable plastic items matching "plastic" keyword.
+
+#### 3. Search for hazardous items
+**Request:**
+```
+GET /items?search=battery&hazardous=true
+```
+
+**Expected Result:** All hazardous battery items.
+
+#### 4. Search with compostable filter
+**Request:**
+```
+GET /items?search=organic&compostable=true
+```
+
+**Expected Result:** All compostable organic items.
+
+#### 5. Search with pagination
+**Request:**
+```
+GET /items?search=bottle&page=1&limit=5
+```
+
+**Expected Result:** First 5 results matching "bottle" keyword.
+
+#### 6. Advanced search with multiple filters
+**Request:**
+```
+GET /items?search=plastic&recyclable=true&hazardous=false&compostable=false&page=1&limit=10
+```
+
+**Expected Result:** Recyclable, non-hazardous, non-compostable items matching "plastic" keyword.
+
+---
+
 ## Testing Workflow
 
 ### Step-by-Step Testing Order:
