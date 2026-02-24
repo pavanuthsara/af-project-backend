@@ -187,7 +187,6 @@ describe('WasteService', () => {
         const itemData = {
           name: 'Plastic Bottle',
           category: 'cat123',
-          disposalInstructions: 'Rinse and recycle',
           recyclable: true
         };
 
@@ -217,8 +216,7 @@ describe('WasteService', () => {
       test('should throw 404 when category does not exist', async () => {
         const itemData = {
           name: 'Plastic Bottle',
-          category: 'nonexistent',
-          disposalInstructions: 'Rinse and recycle'
+          category: 'nonexistent'
         };
 
         WasteCategory.findById = jest.fn().mockResolvedValue(null);

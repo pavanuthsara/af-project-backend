@@ -229,7 +229,6 @@ Creates a new waste item.
   "name": "Plastic Water Bottle",
   "description": "Empty plastic water bottle, typically PET material",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Rinse, remove cap, and place in recycling bin. Can be recycled into new bottles, clothing, or other products.",
   "recyclable": true,
   "hazardous": false,
   "compostable": false
@@ -249,7 +248,6 @@ Creates a new waste item.
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -318,7 +316,6 @@ GET /api/items?search=plastic&recyclable=true&hazardous=false&page=1&limit=20
         "name": "Plastic",
         "description": "Various types of plastic materials"
       },
-      "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
       "recyclable": true,
       "hazardous": false,
       "compostable": false,
@@ -362,7 +359,6 @@ GET /api/items/67a1b2c3d4e5f6g7h8i9j0k3
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -389,7 +385,7 @@ Updates an existing waste item.
 ```json
 {
   "description": "Updated description for plastic water bottles",
-  "disposalInstructions": "Updated disposal instructions here"
+  "recyclable": true
 }
 ```
 
@@ -406,7 +402,6 @@ Updates an existing waste item.
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Updated disposal instructions here",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -562,7 +557,6 @@ Deletes a waste item.
   "name": "Plastic Water Bottle",
   "description": "Empty PET plastic water bottle",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Rinse, remove cap, crush to save space, and place in recycling bin",
   "recyclable": true,
   "hazardous": false,
   "compostable": false
@@ -575,7 +569,6 @@ Deletes a waste item.
   "name": "Newspaper",
   "description": "Used newspapers and magazines",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Keep dry, bundle together, and place in paper recycling bin",
   "recyclable": true,
   "hazardous": false,
   "compostable": true
@@ -588,7 +581,6 @@ Deletes a waste item.
   "name": "AA Battery",
   "description": "Standard AA alkaline battery",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Take to designated battery collection point. Do not dispose in regular trash.",
   "recyclable": true,
   "hazardous": true,
   "compostable": false
@@ -601,7 +593,6 @@ Deletes a waste item.
   "name": "Food Scraps",
   "description": "Fruit and vegetable scraps, coffee grounds, eggshells",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Place in compost bin or green waste container. Avoid meat and dairy.",
   "recyclable": false,
   "hazardous": false,
   "compostable": true

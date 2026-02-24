@@ -6,7 +6,7 @@ class WasteItemController {
   }
 
   validateWasteItemInput = (data) => {
-    const requiredFields = ['name', 'category', 'disposalInstructions'];
+    const requiredFields = ['name', 'category'];
     const missingFields = requiredFields.filter(field => !data[field]);
     
     if (missingFields.length > 0) {
@@ -20,19 +20,17 @@ class WasteItemController {
         name, 
         description, 
         category, 
-        disposalInstructions, 
         recyclable, 
         hazardous, 
         compostable 
       } = req.body;
       
-      this.validateWasteItemInput({ name, category, disposalInstructions });
+      this.validateWasteItemInput({ name, category });
       
       const item = await this.wasteService.createWasteItem({
         name,
         description,
         category,
-        disposalInstructions,
         recyclable: recyclable || false,
         hazardous: hazardous || false,
         compostable: compostable || false
