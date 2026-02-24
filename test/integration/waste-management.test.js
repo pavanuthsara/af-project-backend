@@ -277,13 +277,11 @@ describe('Waste Management API Integration Tests', () => {
         await WasteItem.create([
           {
             name: 'Bottle',
-            category: category._id,
-            disposalInstructions: 'Recycle'
+            category: category._id
           },
           {
             name: 'Container',
-            category: category._id,
-            disposalInstructions: 'Recycle'
+            category: category._id
           }
         ]);
 
@@ -315,7 +313,7 @@ describe('Waste Management API Integration Tests', () => {
     });
   });
 
-  describe('Waste Item Management - KB-02: Admin adds waste items with guidelines', () => {
+  describe('Waste Item Management - KB-02: Admin adds waste items', () => {
     let plasticCategory;
     let ewasteCategory;
 
@@ -334,12 +332,11 @@ describe('Waste Management API Integration Tests', () => {
     });
 
     describe('POST /items', () => {
-      test('should create a waste item with disposal guidelines successfully', async () => {
+      test('should create a waste item successfully', async () => {
         const itemData = {
           name: 'Plastic Bottle',
           description: 'PET plastic bottle',
           category: plasticCategory._id.toString(),
-          disposalInstructions: 'Remove cap, rinse thoroughly, and place in recycling bin',
           recyclable: true,
           hazardous: false,
           compostable: false
@@ -354,19 +351,17 @@ describe('Waste Management API Integration Tests', () => {
         expect(response.body.data).toMatchObject({
           name: 'Plastic Bottle',
           description: 'PET plastic bottle',
-          disposalInstructions: itemData.disposalInstructions,
           recyclable: true,
           hazardous: false
         });
         expect(response.body.data.category).toHaveProperty('name', 'Plastic');
       });
 
-      test('should create hazardous e-waste item with safety guidelines', async () => {
+      test('should create hazardous e-waste item successfully', async () => {
         const itemData = {
           name: 'Lithium Battery',
           description: 'Rechargeable lithium-ion battery',
           category: ewasteCategory._id.toString(),
-          disposalInstructions: 'Do not throw in regular trash. Take to designated e-waste collection center. Keep away from heat sources.',
           recyclable: false,
           hazardous: true,
           compostable: false
@@ -379,13 +374,12 @@ describe('Waste Management API Integration Tests', () => {
 
         expect(response.body.data.name).toBe('Lithium Battery');
         expect(response.body.data.hazardous).toBe(true);
-        expect(response.body.data.disposalInstructions).toContain('e-waste collection center');
       });
 
       test('should return 400 for missing required fields', async () => {
         const invalidData = {
           name: 'Bottle'
-          // missing category and disposalInstructions
+          // missing category
         };
 
         const response = await request(app)
@@ -394,7 +388,7 @@ describe('Waste Management API Integration Tests', () => {
           .expect(500);
 
         expect(response.body.success).toBe(false);
-        expect(response.body.message).toContain('Missing required fields');
+        expect(response.body.message).toContain('Missing required fields: category');
       });
 
       test('should return 404 when category does not exist', async () => {
@@ -402,8 +396,7 @@ describe('Waste Management API Integration Tests', () => {
 
         const itemData = {
           name: 'Bottle',
-          category: fakeId.toString(),
-          disposalInstructions: 'Recycle'
+          category: fakeId.toString()
         };
 
         const response = await request(app)
@@ -421,19 +414,16 @@ describe('Waste Management API Integration Tests', () => {
           {
             name: 'Plastic Bottle',
             category: plasticCategory._id,
-            disposalInstructions: 'Recycle',
             recyclable: true
           },
           {
             name: 'Plastic Container',
             category: plasticCategory._id,
-            disposalInstructions: 'Recycle',
             recyclable: true
           },
           {
             name: 'Old Phone',
             category: ewasteCategory._id,
-            disposalInstructions: 'E-waste center',
             hazardous: true
           }
         ]);
@@ -513,7 +503,6 @@ describe('Waste Management API Integration Tests', () => {
         const item = await WasteItem.create({
           name: 'Plastic Bottle',
           category: plasticCategory._id,
-          disposalInstructions: 'Rinse and recycle',
           recyclable: true
         });
 
@@ -524,7 +513,6 @@ describe('Waste Management API Integration Tests', () => {
         expect(response.body.success).toBe(true);
         expect(response.body.data.name).toBe('Plastic Bottle');
         expect(response.body.data.category).toHaveProperty('name', 'Plastic');
-        expect(response.body.data.disposalInstructions).toBe('Rinse and recycle');
       });
 
       test('should return 404 for non-existent item', async () => {
@@ -540,16 +528,14 @@ describe('Waste Management API Integration Tests', () => {
     });
 
     describe('PUT /items/:id', () => {
-      test('should update waste item disposal instructions', async () => {
+      test('should update waste item description', async () => {
         const item = await WasteItem.create({
           name: 'Plastic Bottle',
           category: plasticCategory._id,
-          disposalInstructions: 'Recycle',
           recyclable: true
         });
 
         const updateData = {
-          disposalInstructions: 'Remove cap, rinse thoroughly, crush, and recycle',
           description: 'Updated description'
         };
 
@@ -559,7 +545,6 @@ describe('Waste Management API Integration Tests', () => {
           .expect(200);
 
         expect(response.body.success).toBe(true);
-        expect(response.body.data.disposalInstructions).toBe(updateData.disposalInstructions);
         expect(response.body.data.description).toBe(updateData.description);
       });
 
@@ -567,7 +552,6 @@ describe('Waste Management API Integration Tests', () => {
         const item = await WasteItem.create({
           name: 'Battery',
           category: ewasteCategory._id,
-          disposalInstructions: 'Take to collection center',
           hazardous: false
         });
 
@@ -593,8 +577,7 @@ describe('Waste Management API Integration Tests', () => {
       test('should return 404 when updating with non-existent category', async () => {
         const item = await WasteItem.create({
           name: 'Bottle',
-          category: plasticCategory._id,
-          disposalInstructions: 'Recycle'
+          category: plasticCategory._id
         });
 
         const fakeId = new mongoose.Types.ObjectId();
@@ -612,8 +595,7 @@ describe('Waste Management API Integration Tests', () => {
       test('should delete a waste item successfully', async () => {
         const item = await WasteItem.create({
           name: 'Plastic Bottle',
-          category: plasticCategory._id,
-          disposalInstructions: 'Recycle'
+          category: plasticCategory._id
         });
 
         const response = await request(app)
@@ -648,9 +630,9 @@ describe('Waste Management API Integration Tests', () => {
       });
 
       await WasteItem.create([
-        { name: 'Item 1', category: category._id, disposalInstructions: 'Test' },
-        { name: 'Item 2', category: category._id, disposalInstructions: 'Test' },
-        { name: 'Item 3', category: category._id, disposalInstructions: 'Test' }
+        { name: 'Item 1', category: category._id },
+        { name: 'Item 2', category: category._id },
+        { name: 'Item 3', category: category._id }
       ]);
 
       // Delete category
@@ -671,8 +653,7 @@ describe('Waste Management API Integration Tests', () => {
 
       const item = await WasteItem.create({
         name: 'Bottle',
-        category: category._id,
-        disposalInstructions: 'Recycle'
+        category: category._id
       });
 
       const response = await request(app)

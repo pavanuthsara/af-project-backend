@@ -21,12 +21,6 @@ const WasteItemSchema = new mongoose.Schema({
     index: true
   },
   
-  disposalInstructions: {
-    type: String,
-    required: [true, 'Disposal instructions are required'],
-    trim: true
-  },
-  
   recyclable: {
     type: Boolean,
     default: false

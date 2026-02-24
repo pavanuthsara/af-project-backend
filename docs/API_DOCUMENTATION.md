@@ -25,126 +25,13 @@ Create a Postman environment with these variables:
 | `token` | (obtained from login) | JWT authentication token |
 | `categoryId` | (created category ID) | For testing item endpoints |
 
----
 
-## Authentication Endpoints
 
-### 1. Sign Up (Create User)
-**POST** `/signup`
-
-Creates a new user account.
-
-> **Note:** The auth routes are at the root level, not under `/api`.
-
-#### Request Body (JSON):
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Response (201 Created):
-```json
-{
-  "message": "User created successfully",
-  "user": {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "user"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
----
-
-### 2. Sign Up Admin User
-**POST** `/signup`
-
-To create an admin user (for testing protected routes), you'll need to manually update the user's role in the database or modify the signup process temporarily.
-
-#### Request Body (JSON):
-```json
-{
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "password": "admin123"
-}
-```
-
-> **Note:** After creating an admin user, manually update their role in MongoDB:
-> ```javascript
-> db.users.updateOne(
->   { email: "admin@example.com" },
->   { $set: { role: "admin" } }
-> )
-> ```
-
----
-
-### 3. Login
-**POST** `/login`
-
-Authenticates a user and returns a JWT token.
-
-#### Request Body (JSON):
-```json
-{
-  "email": "admin@example.com",
-  "password": "admin123"
-}
-```
-
-#### Response (200 OK):
-```json
-{
-  "message": "Login successful",
-  "user": {
-    "id": "67a1b2c3d4e5f6g7h8i9j0k1",
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "role": "admin"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-> **Important:** Copy the `token` value for use in protected routes. Save it to your Postman environment variable `token`.
-
----
-
-### 4. Get Profile (Protected Route)
-**GET** `/profile`
-
-Returns the authenticated user's profile.
-
-#### Headers:
-| Key | Value |
-|-----|-------|
-| `Authorization` | `Bearer {{token}}` |
-
-#### Response (200 OK):
-```json
-{
-  "message": "This is a protected route",
-  "user": {
-    "id": "67a1b2c3d4e5f6g7h8i9j0k1",
-    "email": "admin@example.com",
-    "role": "admin",
-    "iat": 1706000000,
-    "exp": 1706003600
-  }
-}
-```
-
----
 
 ## Category Endpoints
 
 ### 1. Create Category (Admin Only)
-**POST** `/api/categories`
+**POST** `/categories`
 
 Creates a new waste category.
 
@@ -187,7 +74,7 @@ Creates a new waste category.
 ---
 
 ### 2. Get All Categories (Public)
-**GET** `/api/categories`
+**GET** `/categories`
 
 Returns all categories with pagination.
 
@@ -199,7 +86,7 @@ Returns all categories with pagination.
 
 #### Example Request:
 ```
-GET /api/categories?page=1&limit=10
+GET /categories?page=1&limit=10
 ```
 
 #### Response (200 OK):
@@ -232,7 +119,7 @@ GET /api/categories?page=1&limit=10
 ---
 
 ### 3. Get Category by ID (Public)
-**GET** `/api/categories/:id`
+**GET** `/categories/:id`
 
 Returns a single category by its ID.
 
@@ -261,7 +148,7 @@ GET /api/categories/67a1b2c3d4e5f6g7h8i9j0k2
 ---
 
 ### 4. Update Category (Admin Only)
-**PUT** `/api/categories/:id`
+**PUT** `/categories/:id`
 
 Updates an existing category.
 
@@ -299,7 +186,7 @@ Updates an existing category.
 ---
 
 ### 5. Delete Category (Admin Only)
-**DELETE** `/api/categories/:id`
+**DELETE** `/categories/:id`
 
 Deletes a category and all associated waste items.
 
@@ -326,7 +213,7 @@ Deletes a category and all associated waste items.
 ## Waste Item Endpoints
 
 ### 1. Create Waste Item (Admin Only)
-**POST** `/api/items`
+**POST** `/items`
 
 Creates a new waste item.
 
@@ -342,7 +229,6 @@ Creates a new waste item.
   "name": "Plastic Water Bottle",
   "description": "Empty plastic water bottle, typically PET material",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Rinse, remove cap, and place in recycling bin. Can be recycled into new bottles, clothing, or other products.",
   "recyclable": true,
   "hazardous": false,
   "compostable": false
@@ -362,7 +248,6 @@ Creates a new waste item.
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -375,7 +260,7 @@ Creates a new waste item.
 ---
 
 ### 2. Get All Waste Items (Public)
-**GET** `/api/items`
+**GET** `/items`
 
 Returns all waste items with pagination, filtering, and search.
 
@@ -431,7 +316,6 @@ GET /api/items?search=plastic&recyclable=true&hazardous=false&page=1&limit=20
         "name": "Plastic",
         "description": "Various types of plastic materials"
       },
-      "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
       "recyclable": true,
       "hazardous": false,
       "compostable": false,
@@ -453,7 +337,7 @@ GET /api/items?search=plastic&recyclable=true&hazardous=false&page=1&limit=20
 ---
 
 ### 3. Get Waste Item by ID (Public)
-**GET** `/api/items/:id`
+**GET** `/items/:id`
 
 Returns a single waste item by its ID.
 
@@ -475,7 +359,6 @@ GET /api/items/67a1b2c3d4e5f6g7h8i9j0k3
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Rinse, remove cap, and place in recycling bin...",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -502,7 +385,7 @@ Updates an existing waste item.
 ```json
 {
   "description": "Updated description for plastic water bottles",
-  "disposalInstructions": "Updated disposal instructions here"
+  "recyclable": true
 }
 ```
 
@@ -519,7 +402,6 @@ Updates an existing waste item.
       "name": "Plastic",
       "description": "Various types of plastic materials"
     },
-    "disposalInstructions": "Updated disposal instructions here",
     "recyclable": true,
     "hazardous": false,
     "compostable": false,
@@ -532,7 +414,7 @@ Updates an existing waste item.
 ---
 
 ### 5. Delete Waste Item (Admin Only)
-**DELETE** `/api/items/:id`
+**DELETE** `/items/:id`
 
 Deletes a waste item.
 
@@ -596,6 +478,92 @@ Deletes a waste item.
   "error": "Internal Server Error"
 }
 ```
+
+---
+
+## KB-03: Search for Waste Items by Keywords
+
+This feature allows citizens to quickly search for waste items by keywords to find out how to dispose of a specific object. The search is case-insensitive and matches item names and descriptions.
+
+### Search Examples
+
+#### 1. Basic keyword search by item name
+**Request:**
+```
+GET /items?search=bottle
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "67a1b2c3d4e5f6g7h8i9j0k3",
+      "name": "Plastic Water Bottle",
+      "description": "Empty PET plastic water bottle",
+      "category": {
+        "_id": "67a1b2c3d4e5f6g7h8i9j0k2",
+        "name": "Plastic",
+        "description": "Various types of plastic materials"
+      },
+      "recyclable": true,
+      "hazardous": false,
+      "compostable": false,
+      "createdAt": "2026-02-15T07:00:00.000Z",
+      "updatedAt": "2026-02-15T07:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalItems": 1,
+    "itemsPerPage": 10,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}
+```
+
+#### 2. Search with recyclable filter
+**Request:**
+```
+GET /items?search=plastic&recyclable=true
+```
+
+**Expected Result:** All recyclable plastic items matching "plastic" keyword.
+
+#### 3. Search for hazardous items
+**Request:**
+```
+GET /items?search=battery&hazardous=true
+```
+
+**Expected Result:** All hazardous battery items.
+
+#### 4. Search with compostable filter
+**Request:**
+```
+GET /items?search=organic&compostable=true
+```
+
+**Expected Result:** All compostable organic items.
+
+#### 5. Search with pagination
+**Request:**
+```
+GET /items?search=bottle&page=1&limit=5
+```
+
+**Expected Result:** First 5 results matching "bottle" keyword.
+
+#### 6. Advanced search with multiple filters
+**Request:**
+```
+GET /items?search=plastic&recyclable=true&hazardous=false&compostable=false&page=1&limit=10
+```
+
+**Expected Result:** Recyclable, non-hazardous, non-compostable items matching "plastic" keyword.
 
 ---
 
@@ -675,7 +643,6 @@ Deletes a waste item.
   "name": "Plastic Water Bottle",
   "description": "Empty PET plastic water bottle",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Rinse, remove cap, crush to save space, and place in recycling bin",
   "recyclable": true,
   "hazardous": false,
   "compostable": false
@@ -688,7 +655,6 @@ Deletes a waste item.
   "name": "Newspaper",
   "description": "Used newspapers and magazines",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Keep dry, bundle together, and place in paper recycling bin",
   "recyclable": true,
   "hazardous": false,
   "compostable": true
@@ -701,7 +667,6 @@ Deletes a waste item.
   "name": "AA Battery",
   "description": "Standard AA alkaline battery",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Take to designated battery collection point. Do not dispose in regular trash.",
   "recyclable": true,
   "hazardous": true,
   "compostable": false
@@ -714,7 +679,6 @@ Deletes a waste item.
   "name": "Food Scraps",
   "description": "Fruit and vegetable scraps, coffee grounds, eggshells",
   "category": "{{categoryId}}",
-  "disposalInstructions": "Place in compost bin or green waste container. Avoid meat and dairy.",
   "recyclable": false,
   "hazardous": false,
   "compostable": true

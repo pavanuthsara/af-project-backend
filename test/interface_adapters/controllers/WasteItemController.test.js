@@ -45,8 +45,7 @@ describe('WasteItemController', () => {
     test('should not throw error when all required fields are present', () => {
       const validData = {
         name: 'Plastic Bottle',
-        category: 'cat123',
-        disposalInstructions: 'Rinse and recycle'
+        category: 'cat123'
       };
 
       expect(() => controller.validateWasteItemInput(validData)).not.toThrow();
@@ -54,8 +53,7 @@ describe('WasteItemController', () => {
 
     test('should throw error when name is missing', () => {
       const invalidData = {
-        category: 'cat123',
-        disposalInstructions: 'Rinse and recycle'
+        category: 'cat123'
       };
 
       expect(() => controller.validateWasteItemInput(invalidData))
@@ -68,14 +66,14 @@ describe('WasteItemController', () => {
       };
 
       expect(() => controller.validateWasteItemInput(invalidData))
-        .toThrow('Missing required fields: category, disposalInstructions');
+        .toThrow('Missing required fields: category');
     });
 
     test('should throw error when all required fields are missing', () => {
       const invalidData = {};
 
       expect(() => controller.validateWasteItemInput(invalidData))
-        .toThrow('Missing required fields: name, category, disposalInstructions');
+        .toThrow('Missing required fields: name, category');
     });
   });
 
@@ -85,7 +83,6 @@ describe('WasteItemController', () => {
         name: 'Plastic Bottle',
         description: 'PET bottle',
         category: 'cat123',
-        disposalInstructions: 'Rinse and recycle',
         recyclable: true,
         hazardous: false,
         compostable: false
@@ -110,8 +107,7 @@ describe('WasteItemController', () => {
     test('should use default false for boolean fields when not provided', async () => {
       const itemData = {
         name: 'Glass Jar',
-        category: 'cat123',
-        disposalInstructions: 'Recycle'
+        category: 'cat123'
       };
 
       const expectedData = {
@@ -132,7 +128,7 @@ describe('WasteItemController', () => {
     test('should handle validation error for missing required fields', async () => {
       mockReq.body = {
         name: 'Plastic Bottle'
-        // missing category and disposalInstructions
+        // missing category
       };
 
       await controller.createWasteItem(mockReq, mockRes, mockNext);
@@ -148,8 +144,7 @@ describe('WasteItemController', () => {
 
       mockReq.body = {
         name: 'Plastic Bottle',
-        category: 'nonexistent',
-        disposalInstructions: 'Recycle'
+        category: 'nonexistent'
       };
 
       mockWasteService.createWasteItem.mockRejectedValue(error);
@@ -164,8 +159,7 @@ describe('WasteItemController', () => {
 
       mockReq.body = {
         name: 'Plastic Bottle',
-        category: 'cat123',
-        disposalInstructions: 'Recycle'
+        category: 'cat123'
       };
 
       mockWasteService.createWasteItem.mockRejectedValue(error);
@@ -322,8 +316,7 @@ describe('WasteItemController', () => {
       const mockItem = {
         _id: '123',
         name: 'Plastic Bottle',
-        category: { name: 'Plastic' },
-        disposalInstructions: 'Rinse and recycle'
+        category: { name: 'Plastic' }
       };
 
       mockReq.params = { id: '123' };
