@@ -37,6 +37,10 @@ app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminCont
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => deleteRecyclingCenterController.handle(req, res));
 
+// --- WASTE MANAGEMENT ROUTES ---
+app.use('/categories', categoryRoutes);
+app.use('/items', itemRoutes);
+
 // 404 HANDLER - (Must be after all valid routes)
 app.use((req, res) => {
   res.status(404).json({
