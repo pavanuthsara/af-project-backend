@@ -57,6 +57,10 @@ app.get('/disposal/stats', authMiddleware, (req, res) => getUserWasteStatsContro
 app.put('/disposal/:id', authMiddleware, (req, res) => updateDisposalController.handle(req, res));
 app.delete('/disposal/:id', authMiddleware, (req, res) => deleteDisposalController.handle(req, res));
 
+// --- WASTE MANAGEMENT ROUTES ---
+app.use('/api/categories', categoryRoutes);
+app.use('/api/items', itemRoutes);
+
 // 404 HANDLER - (Must be after all valid routes)
 app.use((req, res) => {
   res.status(404).json({
