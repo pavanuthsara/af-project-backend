@@ -6,12 +6,21 @@ const AdminLoginController = require('../../interface_adapters/controllers/Admin
 const RegisterAdminController = require('../../interface_adapters/controllers/RegisterAdminController');
 const RegisterRecyclingCenterController = require('../../interface_adapters/controllers/RegisterRecyclingCenterController');
 const DeleteRecyclingCenterController = require('../../interface_adapters/controllers/DeleteRecyclingCenterController');
+<<<<<<< Updated upstream
 const CreateDisposalController = require('../../interface_adapters/controllers/disposal/CreateDisposalController');
 const GetDisposalHistoryController = require('../../interface_adapters/controllers/disposal/GetDisposalHistoryController');
 const GetDisposalStatsController = require('../../interface_adapters/controllers/disposal/GetDisposalStatsController');
 const GetUserWasteStatsController = require('../../interface_adapters/controllers/disposal/GetUserWasteStatsController');
 const UpdateDisposalController = require('../../interface_adapters/controllers/disposal/UpdateDisposalController');
 const DeleteDisposalController = require('../../interface_adapters/controllers/disposal/DeleteDisposalController');
+=======
+const CreateDisposalController = require('../../interface_adapters/controllers/CreateDisposalController');
+const GetDisposalHistoryController = require('../../interface_adapters/controllers/GetDisposalHistoryController');
+const GetDisposalStatsController = require('../../interface_adapters/controllers/GetDisposalStatsController');
+const GetUserWasteStatsController = require('../../interface_adapters/controllers/GetUserWasteStatsController');
+const UpdateDisposalController = require('../../interface_adapters/controllers/UpdateDisposalController');
+const DeleteDisposalController = require('../../interface_adapters/controllers/DeleteDisposalController');
+>>>>>>> Stashed changes
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
@@ -56,6 +65,13 @@ app.get('/disposal/history', authMiddleware, (req, res) => getDisposalHistoryCon
 app.get('/disposal/stats', authMiddleware, (req, res) => getUserWasteStatsController.handle(req, res));
 app.put('/disposal/:id', authMiddleware, (req, res) => updateDisposalController.handle(req, res));
 app.delete('/disposal/:id', authMiddleware, (req, res) => deleteDisposalController.handle(req, res));
+<<<<<<< Updated upstream
+
+// --- WASTE MANAGEMENT ROUTES ---
+app.use('/api/categories', categoryRoutes);
+app.use('/api/items', itemRoutes);
+=======
+>>>>>>> Stashed changes
 
 // --- WASTE MANAGEMENT ROUTES ---
 app.use('/api/categories', categoryRoutes);
