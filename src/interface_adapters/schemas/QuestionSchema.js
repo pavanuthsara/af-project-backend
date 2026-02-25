@@ -41,4 +41,7 @@ const QuestionSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Index on quiz for efficient queries when fetching questions for a specific quiz
+QuestionSchema.index({ quiz: 1 });
+
 module.exports = mongoose.model("Question", QuestionSchema);
