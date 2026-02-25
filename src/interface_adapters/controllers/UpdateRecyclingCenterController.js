@@ -1,0 +1,62 @@
+const UpdateRecyclingCenter = require('../../application/use_cases/UpdateRecyclingCenter');
+const MongoRecyclingCenterRepository = require('../repositories/MongoRecyclingCenterRepository');
+
+class UpdateRecyclingCenterController {
+  async handle(req, res) {
+    try {
+      const { id } = req.params;
+      const {
+        name,
+        address,
+        location,
+        acceptedWasteTypes,
+        operatingHours,
+        maxCapacityKg,
+        currentLoadKg,
+      } = req.body;
+
+      const recyclingCenterRepository = new MongoRecyclingCenterRepository();
+      const updateRecyclingCenterUseCase = new UpdateRecyclingCenter(recyclingCenterRepository);
+
+      const recyclingCenter = await updateRecyclingCenterUseCase.execute(id, {
+        name,
+        address,
+        location,
+        acceptedWasteTypes,
+        operatingHours,
+        maxCapacityKg,
+        currentLoadKg,
+      });
+
+      return res.status(200).json({
+        message: 'Recycling center updated successfully',
+        recyclingCenter: {
+          id: recyclingCenter.id,
+          name: recyclingCenter.name,
+          address: recyclingCenter.address,
+          location: recyclingCenter.location,
+          acceptedWasteTypes: recyclingCenter.acceptedWasteTypes,
+          operatingHours: recyclingCenter.operatingHours,
+          maxCapacityKg: recyclingCenter.maxCapacityKg,
+          currentLoadKg: recyclingCenter.currentLoadKg,
+        },
+      });
+    } catch (error) {
+      if (error.statusCode === 409) {
+        return res.status(409).json({ error: error.message });
+      }
+
+      if (error.statusCode === 400 || error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message });
+      }
+
+      if (error.statusCode === 404) {
+        return res.status(404).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+}
+
+module.exports = UpdateRecyclingCenterController;

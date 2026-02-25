@@ -37,6 +37,37 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     return Boolean(deletedCenter);
   }
 
+  async updateById(id, data) {
+    try {
+      const updatedCenter = await RecyclingCenterModel.findByIdAndUpdate(
+        id,
+        {
+          name: data.name,
+          address: data.address,
+          location: data.location,
+          acceptedWasteTypes: data.acceptedWasteTypes,
+          operatingHours: data.operatingHours,
+          maxCapacityKg: data.maxCapacityKg,
+          currentLoadKg: data.currentLoadKg,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      if (!updatedCenter) return null;
+      return this.toEntity(updatedCenter);
+    } catch (error) {
+      if (error.code === 11000) {
+        const duplicateError = new Error('Recycling center already exists');
+        duplicateError.statusCode = 409;
+        throw duplicateError;
+      }
+      throw error;
+    }
+  }
+
   toEntity(mongoRecyclingCenter) {
     return new RecyclingCenter(
       mongoRecyclingCenter._id.toString(),
