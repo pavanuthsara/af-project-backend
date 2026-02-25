@@ -6,6 +6,12 @@ const AdminLoginController = require('../../interface_adapters/controllers/Admin
 const RegisterAdminController = require('../../interface_adapters/controllers/RegisterAdminController');
 const RegisterRecyclingCenterController = require('../../interface_adapters/controllers/RegisterRecyclingCenterController');
 const DeleteRecyclingCenterController = require('../../interface_adapters/controllers/DeleteRecyclingCenterController');
+const CreateDisposalController = require('../../interface_adapters/controllers/disposal/CreateDisposalController');
+const GetDisposalHistoryController = require('../../interface_adapters/controllers/disposal/GetDisposalHistoryController');
+const GetDisposalStatsController = require('../../interface_adapters/controllers/disposal/GetDisposalStatsController');
+const GetUserWasteStatsController = require('../../interface_adapters/controllers/disposal/GetUserWasteStatsController');
+const UpdateDisposalController = require('../../interface_adapters/controllers/disposal/UpdateDisposalController');
+const DeleteDisposalController = require('../../interface_adapters/controllers/disposal/DeleteDisposalController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
@@ -29,6 +35,12 @@ const adminLoginController = new AdminLoginController();
 const registerAdminController = new RegisterAdminController();
 const registerRecyclingCenterController = new RegisterRecyclingCenterController();
 const deleteRecyclingCenterController = new DeleteRecyclingCenterController();
+const createDisposalController = new CreateDisposalController();
+const getDisposalHistoryController = new GetDisposalHistoryController();
+const getDisposalStatsController = new GetDisposalStatsController();
+const getUserWasteStatsController = new GetUserWasteStatsController();
+const updateDisposalController = new UpdateDisposalController();
+const deleteDisposalController = new DeleteDisposalController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -39,6 +51,18 @@ app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => deleteRecyclingCenterController.handle(req, res));
+app.get('/admin/disposal/stats', adminAuthMiddleware, (req, res) => getDisposalStatsController.handle(req, res));
+
+// --- CITIZEN PROTECTED ROUTES (Disposal Logs) ---
+app.post('/disposal', authMiddleware, (req, res) => createDisposalController.handle(req, res));
+app.get('/disposal/history', authMiddleware, (req, res) => getDisposalHistoryController.handle(req, res));
+app.get('/disposal/stats', authMiddleware, (req, res) => getUserWasteStatsController.handle(req, res));
+app.put('/disposal/:id', authMiddleware, (req, res) => updateDisposalController.handle(req, res));
+app.delete('/disposal/:id', authMiddleware, (req, res) => deleteDisposalController.handle(req, res));
+
+// --- WASTE MANAGEMENT ROUTES ---
+app.use('/api/categories', categoryRoutes);
+app.use('/api/items', itemRoutes);
 
 // --- WASTE MANAGEMENT ROUTES ---
 app.use('/categories', categoryRoutes);
@@ -96,3 +120,4 @@ const startServer = async () => {
 };
 
 startServer();
+module.exports = app;
