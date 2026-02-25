@@ -72,7 +72,16 @@ class QuizController {
     updateQuestion = async (req, res, next) => {
         try {
             const { questionId } = req.params;
-            const updateData = req.body;
+            const { questionText, options, correctAnswer, explanation, imageUrl } = req.body;
+            
+            // Only allow specific fields to be updated
+            const updateData = {};
+            if (questionText !== undefined) updateData.questionText = questionText;
+            if (options !== undefined) updateData.options = options;
+            if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
+            if (explanation !== undefined) updateData.explanation = explanation;
+            if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+            
             const updatedQuestion = await this.quizService.updateQuestion(questionId, updateData);
 
             res.status(200).json({
