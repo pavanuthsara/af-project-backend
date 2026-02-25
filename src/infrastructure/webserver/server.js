@@ -7,6 +7,7 @@ const RegisterAdminController = require('../../interface_adapters/controllers/Re
 const RegisterRecyclingCenterController = require('../../interface_adapters/controllers/RegisterRecyclingCenterController');
 const DeleteRecyclingCenterController = require('../../interface_adapters/controllers/DeleteRecyclingCenterController');
 const UpdateRecyclingCenterController = require('../../interface_adapters/controllers/UpdateRecyclingCenterController');
+const ViewRecyclingCentersController = require('../../interface_adapters/controllers/ViewRecyclingCentersController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 const managerAuthMiddleware = require('../../interface_adapters/middleware/ManagerAuthMiddleware');
@@ -25,6 +26,7 @@ const registerAdminController = new RegisterAdminController();
 const registerRecyclingCenterController = new RegisterRecyclingCenterController();
 const deleteRecyclingCenterController = new DeleteRecyclingCenterController();
 const updateRecyclingCenterController = new UpdateRecyclingCenterController();
+const viewRecyclingCentersController = new ViewRecyclingCentersController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -35,6 +37,9 @@ app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => deleteRecyclingCenterController.handle(req, res));
+
+// --- USER PROTECTED ROUTES ---
+app.get('/recycling-centers', authMiddleware, (req, res) => viewRecyclingCentersController.handle(req, res));
 
 // --- MANAGER PROTECTED ROUTES ---
 app.put('/manager/recycling-centers/:id', managerAuthMiddleware, (req, res) => updateRecyclingCenterController.handle(req, res));

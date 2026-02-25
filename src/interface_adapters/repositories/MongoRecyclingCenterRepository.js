@@ -3,6 +3,11 @@ const RecyclingCenterModel = require('../schemas/RecyclingCenterSchema');
 const RecyclingCenter = require('../../domain/entities/RecyclingCenter');
 
 class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
+  async findAll() {
+    const mongoRecyclingCenters = await RecyclingCenterModel.find({}).sort({ name: 1 });
+    return mongoRecyclingCenters.map((mongoRecyclingCenter) => this.toEntity(mongoRecyclingCenter));
+  }
+
   async save(recyclingCenter) {
     try {
       const mongoRecyclingCenter = await RecyclingCenterModel.create({

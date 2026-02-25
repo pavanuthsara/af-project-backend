@@ -1,4 +1,8 @@
 class RecyclingCenterRepository {
+  async findAll() {
+    throw new Error('Method not implemented: findAll');
+  }
+
   async save(recyclingCenter) {
     throw new Error('Method not implemented: save');
   }
