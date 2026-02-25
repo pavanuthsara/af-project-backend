@@ -165,6 +165,29 @@ class QuizController {
                 throw error;
             }
 
+            // Validate each answer object structure
+            for (let i = 0; i < answers.length; i++) {
+                const answer = answers[i];
+                
+                if (!answer || typeof answer !== 'object') {
+                    const error = new Error(`Answer at index ${i} must be an object`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+                
+                if (!answer.questionId || typeof answer.questionId !== 'string') {
+                    const error = new Error(`Answer at index ${i} must have a valid questionId (string)`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+                
+                if (!answer.selectedOption || typeof answer.selectedOption !== 'string') {
+                    const error = new Error(`Answer at index ${i} must have a valid selectedOption (string)`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+            }
+
             const result = await this.quizService.submitQuiz(userId, quizId, answers);
 
             res.status(200).json({
