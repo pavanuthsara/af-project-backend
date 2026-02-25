@@ -128,6 +128,12 @@ class QuizService {
         // Questions are returned WITHOUT correctAnswer and explanation (select: false)
         const questions = await Question.find({ quiz: quizId });
 
+        if (questions.length === 0) {
+            const error = new Error('This quiz has no questions yet');
+            error.statusCode = 400;
+            throw error;
+        }
+
         // Shuffle questions using Fisher-Yates
         const shuffled = [...questions];
         for (let i = shuffled.length - 1; i > 0; i--) {
