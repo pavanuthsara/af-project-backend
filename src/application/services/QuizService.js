@@ -168,6 +168,15 @@ class QuizService {
 
         // Step 1: Fetch Truth – get correct answers (explicitly select hidden fields)
         const questionIds = submittedAnswers.map(a => a.questionId);
+
+        // Validate all question IDs before querying to prevent CastError
+        const invalidIds = questionIds.filter(id => !mongoose.Types.ObjectId.isValid(id));
+        if (invalidIds.length > 0) {
+            const error = new Error(`Invalid question ID(s): ${invalidIds.join(', ')}`);
+            error.statusCode = 400;
+            throw error;
+        }
+
         const questions = await Question.find({
             _id: { $in: questionIds },
             quiz: quizId
