@@ -29,4 +29,7 @@ const QuizAttemptSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
+QuizAttemptSchema.index({ user: 1, quiz: 1 });
+QuizAttemptSchema.index({ user: 1, createdAt: -1 });
+
 module.exports = mongoose.model('QuizAttempt', QuizAttemptSchema);
