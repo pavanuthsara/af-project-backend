@@ -73,6 +73,40 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     }
   }
 
+  async search(filters) {
+    const and = [];
+    const acceptedWasteTypes = Array.isArray(filters.acceptedWasteTypes) ? filters.acceptedWasteTypes : [];
+    const addressKeywords = Array.isArray(filters.addressKeywords) ? filters.addressKeywords : [];
+
+    if (acceptedWasteTypes.length > 0) {
+      and.push({ acceptedWasteTypes: { $in: acceptedWasteTypes } });
+    }
+
+    if (filters.name) {
+      and.push({ name: new RegExp(this.escapeRegex(filters.name), 'i') });
+    }
+
+    const addressTerms = [];
+    if (filters.city) addressTerms.push(filters.city);
+    addressKeywords.forEach((term) => addressTerms.push(term));
+
+    if (addressTerms.length > 0) {
+      and.push({
+        $or: addressTerms.map((term) => ({
+          address: new RegExp(this.escapeRegex(term), 'i'),
+        })),
+      });
+    }
+
+    const query = and.length > 0 ? { $and: and } : {};
+    const mongoRecyclingCenters = await RecyclingCenterModel.find(query).sort({ name: 1 });
+    return mongoRecyclingCenters.map((mongoRecyclingCenter) => this.toEntity(mongoRecyclingCenter));
+  }
+
+  escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   toEntity(mongoRecyclingCenter) {
     return new RecyclingCenter(
       mongoRecyclingCenter._id.toString(),
