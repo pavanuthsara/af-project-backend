@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Quiz = require('../../interface_adapters/schemas/QuizSchema');
 const Question = require('../../interface_adapters/schemas/QuestionSchema');
 const QuizAttempt = require('../../interface_adapters/schemas/QuizAttemptSchema');
@@ -74,6 +75,7 @@ class QuizService {
      * Uses MongoDB aggregation with $lookup to join with QuizAttempt.
      */
     async getQuizzes(userId) {
+        const userObjectId = new mongoose.Types.ObjectId(userId);
         const quizzes = await Quiz.aggregate([
             {
                 $lookup: {
@@ -85,7 +87,7 @@ class QuizService {
                                 $expr: {
                                     $and: [
                                         { $eq: ['$quiz', '$$quizId'] },
-                                        { $eq: ['$user', userId] }
+                                        { $eq: ['$user', userObjectId] }
                                     ]
                                 }
                             }
