@@ -10,6 +10,13 @@ jest.mock('../../../src/interface_adapters/schemas/QuestionSchema');
 jest.mock('../../../src/interface_adapters/schemas/QuizAttemptSchema');
 jest.mock('../../../src/interface_adapters/schemas/UserSchema');
 
+// Valid 24-character hex strings that pass mongoose.Types.ObjectId.isValid()
+const VALID_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaa';
+const VALID_QUIZ_ID = 'bbbbbbbbbbbbbbbbbbbbbbbb';
+const VALID_QUESTION_ID_1 = 'cccccccccccccccccccccccc';
+const VALID_QUESTION_ID_2 = 'dddddddddddddddddddddddd';
+const VALID_QUESTION_ID_3 = 'eeeeeeeeeeeeeeeeeeeeeeee';
+
 describe('QuizService', () => {
   let quizService;
 
@@ -27,9 +34,9 @@ describe('QuizService', () => {
           passingScore: 70
         };
 
-        const mockQuiz = { 
-          ...quizData, 
-          _id: 'quiz123', 
+        const mockQuiz = {
+          ...quizData,
+          _id: 'quiz123',
           save: jest.fn().mockResolvedValue({ _id: 'quiz123', ...quizData })
         };
         Quiz.mockImplementation(() => mockQuiz);
@@ -53,9 +60,9 @@ describe('QuizService', () => {
         };
 
         const mockQuiz = { _id: quizId, title: 'Recycling Basics' };
-        const mockQuestion = { 
-          ...questionData, 
-          quiz: quizId, 
+        const mockQuestion = {
+          ...questionData,
+          quiz: quizId,
           _id: 'question123',
           save: jest.fn().mockResolvedValue({ _id: 'question123', ...questionData, quiz: quizId })
         };
@@ -159,7 +166,6 @@ describe('QuizService', () => {
   describe('User Methods', () => {
     describe('getQuizzes', () => {
       test('should return all quizzes with user completion status', async () => {
-        const userId = 'user123';
         const mockQuizzes = [
           {
             _id: 'quiz1',
@@ -177,7 +183,7 @@ describe('QuizService', () => {
 
         Quiz.aggregate = jest.fn().mockResolvedValue(mockQuizzes);
 
-        const result = await quizService.getQuizzes(userId);
+        const result = await quizService.getQuizzes(VALID_USER_ID);
 
         expect(Quiz.aggregate).toHaveBeenCalledWith(
           expect.arrayContaining([
@@ -193,12 +199,26 @@ describe('QuizService', () => {
         expect(result[1].completed).toBe(false);
       });
 
-      test('should handle empty quiz list', async () => {
-        const userId = 'user123';
-
+      test('should convert userId string to ObjectId in the aggregation pipeline', async () => {
         Quiz.aggregate = jest.fn().mockResolvedValue([]);
 
-        const result = await quizService.getQuizzes(userId);
+        await quizService.getQuizzes(VALID_USER_ID);
+
+        // Verify the pipeline uses an ObjectId in the $user comparison, not a raw string
+        const pipeline = Quiz.aggregate.mock.calls[0][0];
+        const lookupStage = pipeline.find(stage => stage.$lookup);
+        const matchStage = lookupStage.$lookup.pipeline[0].$match;
+        const userComparison = matchStage.$expr.$and[1].$eq[1];
+
+        // The value should NOT be a plain string – it should be an ObjectId instance
+        expect(typeof userComparison).not.toBe('string');
+        expect(userComparison.toString()).toBe(VALID_USER_ID);
+      });
+
+      test('should handle empty quiz list', async () => {
+        Quiz.aggregate = jest.fn().mockResolvedValue([]);
+
+        const result = await quizService.getQuizzes(VALID_USER_ID);
 
         expect(result).toEqual([]);
       });
@@ -261,41 +281,39 @@ describe('QuizService', () => {
     });
 
     describe('submitQuiz', () => {
-      test('should grade quiz correctly and award points and badge when passed', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
+      test('should grade quiz correctly and not award points when not passed', async () => {
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' },
-          { questionId: 'q2', selectedOption: 'B' },
-          { questionId: 'q3', selectedOption: 'C' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' },
+          { questionId: VALID_QUESTION_ID_2, selectedOption: 'B' },
+          { questionId: VALID_QUESTION_ID_3, selectedOption: 'C' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
+        const mockQuiz = {
+          _id: VALID_QUIZ_ID,
           title: 'Recycling Basics',
           passingScore: 70
         };
 
         const mockQuestions = [
-          { 
-            _id: 'q1', 
-            correctAnswer: 'A', 
-            explanation: 'Explanation 1' 
+          {
+            _id: VALID_QUESTION_ID_1,
+            correctAnswer: 'A',
+            explanation: 'Explanation 1'
           },
-          { 
-            _id: 'q2', 
-            correctAnswer: 'B', 
-            explanation: 'Explanation 2' 
+          {
+            _id: VALID_QUESTION_ID_2,
+            correctAnswer: 'B',
+            explanation: 'Explanation 2'
           },
-          { 
-            _id: 'q3', 
-            correctAnswer: 'D', 
-            explanation: 'Explanation 3' 
+          {
+            _id: VALID_QUESTION_ID_3,
+            correctAnswer: 'D',
+            explanation: 'Explanation 3'
           }
         ];
 
         const mockUser = {
-          _id: userId,
+          _id: VALID_USER_ID,
           ecoPoints: 50,
           badges: [],
           save: jest.fn().mockResolvedValue(true)
@@ -306,31 +324,31 @@ describe('QuizService', () => {
         };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue(mockQuestions)
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
-        
+
         User.findById = jest.fn().mockResolvedValue(mockUser);
         QuizAttempt.mockImplementation(() => mockAttempt);
 
-        const result = await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        const result = await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
 
-        expect(Quiz.findById).toHaveBeenCalledWith(quizId);
+        expect(Quiz.findById).toHaveBeenCalledWith(VALID_QUIZ_ID);
         expect(Question.find).toHaveBeenCalledWith({
-          _id: { $in: ['q1', 'q2', 'q3'] },
-          quiz: quizId
+          _id: { $in: [VALID_QUESTION_ID_1, VALID_QUESTION_ID_2, VALID_QUESTION_ID_3] },
+          quiz: VALID_QUIZ_ID
         });
         expect(mockQuery.select).toHaveBeenCalledWith('+correctAnswer +explanation');
-        
-        // Should pass with 67% (2/3 correct)
+
+        // Should fail with 67% (2/3 correct) since passingScore is 70%
         expect(result.score).toBe(67);
         expect(result.correctAnswers).toBe(2);
         expect(result.totalQuestions).toBe(3);
         expect(result.passed).toBe(false); // 67% < 70%
         expect(result.wrongAnswerExplanations).toHaveLength(1);
-        expect(result.wrongAnswerExplanations[0].questionId).toBe('q3');
+        expect(result.wrongAnswerExplanations[0].questionId).toBe(VALID_QUESTION_ID_3);
         expect(result.wrongAnswerExplanations[0].correctAnswer).toBe('D');
 
         // User should not receive points/badge since didn't pass
@@ -338,26 +356,24 @@ describe('QuizService', () => {
       });
 
       test('should award eco-points and badge when user passes', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' },
-          { questionId: 'q2', selectedOption: 'B' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' },
+          { questionId: VALID_QUESTION_ID_2, selectedOption: 'B' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
+        const mockQuiz = {
+          _id: VALID_QUIZ_ID,
           title: 'Recycling Basics',
           passingScore: 70
         };
 
         const mockQuestions = [
-          { _id: 'q1', correctAnswer: 'A', explanation: 'Exp 1' },
-          { _id: 'q2', correctAnswer: 'B', explanation: 'Exp 2' }
+          { _id: VALID_QUESTION_ID_1, correctAnswer: 'A', explanation: 'Exp 1' },
+          { _id: VALID_QUESTION_ID_2, correctAnswer: 'B', explanation: 'Exp 2' }
         ];
 
         const mockUser = {
-          _id: userId,
+          _id: VALID_USER_ID,
           ecoPoints: 50,
           badges: [],
           save: jest.fn().mockResolvedValue(true)
@@ -368,55 +384,53 @@ describe('QuizService', () => {
         };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue(mockQuestions)
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
-        
+
         User.findById = jest.fn().mockResolvedValue(mockUser);
         QuizAttempt.mockImplementation(() => mockAttempt);
 
-        const result = await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        const result = await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
 
         expect(result.score).toBe(100);
         expect(result.passed).toBe(true);
         expect(result.wrongAnswerExplanations).toHaveLength(0);
-        
+
         // Verify eco-points were added
         expect(mockUser.ecoPoints).toBe(60); // 50 + 10
-        
+
         // Verify badge was added
         expect(mockUser.badges).toHaveLength(1);
         expect(mockUser.badges[0].title).toBe('Certified: Recycling Basics');
-        expect(mockUser.badges[0].quizId).toBe(quizId);
+        expect(mockUser.badges[0].quizId).toBe(VALID_QUIZ_ID);
         expect(mockUser.save).toHaveBeenCalled();
       });
 
       test('should not add duplicate badge if already earned', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
+        const mockQuiz = {
+          _id: VALID_QUIZ_ID,
           title: 'Recycling Basics',
           passingScore: 70
         };
 
         const mockQuestions = [
-          { _id: 'q1', correctAnswer: 'A', explanation: 'Exp 1' }
+          { _id: VALID_QUESTION_ID_1, correctAnswer: 'A', explanation: 'Exp 1' }
         ];
 
         const mockUser = {
-          _id: userId,
+          _id: VALID_USER_ID,
           ecoPoints: 50,
           badges: [
-            { 
-              title: 'Certified: Recycling Basics', 
-              quizId: quizId,
+            {
+              title: 'Certified: Recycling Basics',
+              quizId: VALID_QUIZ_ID,
               earnedAt: new Date()
             }
           ],
@@ -428,44 +442,42 @@ describe('QuizService', () => {
         };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue(mockQuestions)
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
-        
+
         User.findById = jest.fn().mockResolvedValue(mockUser);
         QuizAttempt.mockImplementation(() => mockAttempt);
 
-        await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
 
         // Should still add eco-points
         expect(mockUser.ecoPoints).toBe(60);
-        
+
         // Should not add duplicate badge
         expect(mockUser.badges).toHaveLength(1);
         expect(mockUser.save).toHaveBeenCalled();
       });
 
       test('should handle user with undefined ecoPoints', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
+        const mockQuiz = {
+          _id: VALID_QUIZ_ID,
           title: 'Recycling Basics',
           passingScore: 70
         };
 
         const mockQuestions = [
-          { _id: 'q1', correctAnswer: 'A', explanation: 'Exp 1' }
+          { _id: VALID_QUESTION_ID_1, correctAnswer: 'A', explanation: 'Exp 1' }
         ];
 
         const mockUser = {
-          _id: userId,
+          _id: VALID_USER_ID,
           // ecoPoints is undefined
           badges: [],
           save: jest.fn().mockResolvedValue(true)
@@ -476,16 +488,16 @@ describe('QuizService', () => {
         };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue(mockQuestions)
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
-        
+
         User.findById = jest.fn().mockResolvedValue(mockUser);
         QuizAttempt.mockImplementation(() => mockAttempt);
 
-        await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
 
         // Should initialize ecoPoints to 10 (0 + 10)
         expect(mockUser.ecoPoints).toBe(10);
@@ -493,103 +505,101 @@ describe('QuizService', () => {
       });
 
       test('should throw 404 error when quiz not found', async () => {
-        const userId = 'user123';
-        const quizId = 'nonexistent';
         const submittedAnswers = [];
 
         Quiz.findById = jest.fn().mockResolvedValue(null);
 
-        await expect(quizService.submitQuiz(userId, quizId, submittedAnswers))
+        await expect(quizService.submitQuiz(VALID_USER_ID, 'nonexistent', submittedAnswers))
           .rejects.toThrow('Quiz not found');
 
         try {
-          await quizService.submitQuiz(userId, quizId, submittedAnswers);
+          await quizService.submitQuiz(VALID_USER_ID, 'nonexistent', submittedAnswers);
         } catch (error) {
           expect(error.statusCode).toBe(404);
         }
       });
 
       test('should throw 400 error when no valid questions found', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' }
         ];
 
-        const mockQuiz = { _id: quizId, title: 'Quiz' };
+        const mockQuiz = { _id: VALID_QUIZ_ID, title: 'Quiz' };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue([])
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
 
-        await expect(quizService.submitQuiz(userId, quizId, submittedAnswers))
+        await expect(quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers))
           .rejects.toThrow('No valid questions found for this quiz');
 
         try {
-          await quizService.submitQuiz(userId, quizId, submittedAnswers);
+          await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
         } catch (error) {
           expect(error.statusCode).toBe(400);
         }
       });
 
-      test('should handle invalid question IDs gracefully', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
+      test('should throw 400 error when some questionIds are not valid ObjectIds', async () => {
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' },
-          { questionId: 'invalid', selectedOption: 'B' } // Invalid question ID
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' },
+          { questionId: 'not-a-valid-id', selectedOption: 'B' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
-          title: 'Quiz',
-          passingScore: 70
-        };
-
-        const mockQuestions = [
-          { _id: 'q1', correctAnswer: 'A', explanation: 'Exp 1' }
-        ];
-
-        const mockAttempt = {
-          save: jest.fn().mockResolvedValue(true)
-        };
-
+        const mockQuiz = { _id: VALID_QUIZ_ID, title: 'Quiz', passingScore: 70 };
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
-        const mockQuery = {
-          select: jest.fn().mockResolvedValue(mockQuestions)
-        };
-        Question.find = jest.fn().mockReturnValue(mockQuery);
-        
-        User.findById = jest.fn().mockResolvedValue(null);
-        QuizAttempt.mockImplementation(() => mockAttempt);
 
-        const result = await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        await expect(quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers))
+          .rejects.toThrow('Invalid question ID(s)');
 
-        // Should only count valid questions
-        expect(result.totalQuestions).toBe(1);
-        expect(result.correctAnswers).toBe(1);
-        expect(result.score).toBe(100);
+        try {
+          await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
+        } catch (error) {
+          expect(error.statusCode).toBe(400);
+          expect(error.message).toContain('not-a-valid-id');
+        }
+      });
+
+      test('should throw 400 error when all questionIds are invalid', async () => {
+        const submittedAnswers = [
+          { questionId: 'bad-id-1', selectedOption: 'A' },
+          { questionId: 'bad-id-2', selectedOption: 'B' }
+        ];
+
+        const mockQuiz = { _id: VALID_QUIZ_ID, title: 'Quiz', passingScore: 70 };
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+
+        await expect(quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers))
+          .rejects.toThrow('Invalid question ID(s)');
+
+        try {
+          await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
+        } catch (error) {
+          expect(error.statusCode).toBe(400);
+          expect(error.message).toContain('bad-id-1');
+          expect(error.message).toContain('bad-id-2');
+        }
+
+        // Should NOT reach Question.find since validation fails first
+        expect(Question.find).not.toHaveBeenCalled();
       });
 
       test('should save quiz attempt with correct data', async () => {
-        const userId = 'user123';
-        const quizId = 'quiz123';
         const submittedAnswers = [
-          { questionId: 'q1', selectedOption: 'A' }
+          { questionId: VALID_QUESTION_ID_1, selectedOption: 'A' }
         ];
 
-        const mockQuiz = { 
-          _id: quizId, 
+        const mockQuiz = {
+          _id: VALID_QUIZ_ID,
           title: 'Quiz',
           passingScore: 70
         };
 
         const mockQuestions = [
-          { _id: 'q1', correctAnswer: 'A', explanation: 'Exp 1' }
+          { _id: VALID_QUESTION_ID_1, correctAnswer: 'A', explanation: 'Exp 1' }
         ];
 
         const mockAttempt = {
@@ -597,26 +607,26 @@ describe('QuizService', () => {
         };
 
         Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
-        
+
         const mockQuery = {
           select: jest.fn().mockResolvedValue(mockQuestions)
         };
         Question.find = jest.fn().mockReturnValue(mockQuery);
-        
+
         User.findById = jest.fn().mockResolvedValue(null);
         QuizAttempt.mockImplementation(() => mockAttempt);
 
-        await quizService.submitQuiz(userId, quizId, submittedAnswers);
+        await quizService.submitQuiz(VALID_USER_ID, VALID_QUIZ_ID, submittedAnswers);
 
         expect(QuizAttempt).toHaveBeenCalledWith({
-          user: userId,
-          quiz: quizId,
+          user: VALID_USER_ID,
+          quiz: VALID_QUIZ_ID,
           score: 100,
           totalQuestions: 1,
           passed: true,
           answers: [
             {
-              question: 'q1',
+              question: VALID_QUESTION_ID_1,
               selectedOption: 'A',
               isCorrect: true
             }
@@ -633,13 +643,13 @@ describe('QuizService', () => {
           _id: userId,
           ecoPoints: 150,
           badges: [
-            { 
-              title: 'Certified: Recycling Basics', 
+            {
+              title: 'Certified: Recycling Basics',
               quizId: 'quiz1',
               earnedAt: new Date('2026-01-01')
             },
-            { 
-              title: 'Certified: Composting 101', 
+            {
+              title: 'Certified: Composting 101',
               quizId: 'quiz2',
               earnedAt: new Date('2026-01-15')
             }
