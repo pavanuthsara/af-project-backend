@@ -1,4 +1,8 @@
 class RecyclingCenterRepository {
+  async findAll() {
+    throw new Error('Method not implemented: findAll');
+  }
+
   async save(recyclingCenter) {
     throw new Error('Method not implemented: save');
   }
@@ -9,6 +13,10 @@ class RecyclingCenterRepository {
 
   async deleteById(id) {
     throw new Error('Method not implemented: deleteById');
+  }
+
+  async updateById(id, data) {
+    throw new Error('Method not implemented: updateById');
   }
 }
 

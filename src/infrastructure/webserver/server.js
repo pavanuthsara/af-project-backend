@@ -12,12 +12,15 @@ const GetDisposalStatsController = require('../../interface_adapters/controllers
 const GetUserWasteStatsController = require('../../interface_adapters/controllers/disposal/GetUserWasteStatsController');
 const UpdateDisposalController = require('../../interface_adapters/controllers/disposal/UpdateDisposalController');
 const DeleteDisposalController = require('../../interface_adapters/controllers/disposal/DeleteDisposalController');
+const UpdateRecyclingCenterController = require('../../interface_adapters/controllers/UpdateRecyclingCenterController');
+const ViewRecyclingCentersController = require('../../interface_adapters/controllers/ViewRecyclingCentersController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
 // Import waste management routes
 const categoryRoutes = require('../../interface_adapters/routes/categoryRoutes');
 const itemRoutes = require('../../interface_adapters/routes/itemRoutes');
+const managerAuthMiddleware = require('../../interface_adapters/middleware/ManagerAuthMiddleware');
 
 // Import quiz module routes
 const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
@@ -41,6 +44,8 @@ const getDisposalStatsController = new GetDisposalStatsController();
 const getUserWasteStatsController = new GetUserWasteStatsController();
 const updateDisposalController = new UpdateDisposalController();
 const deleteDisposalController = new DeleteDisposalController();
+const updateRecyclingCenterController = new UpdateRecyclingCenterController();
+const viewRecyclingCentersController = new ViewRecyclingCentersController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -51,6 +56,12 @@ app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
 app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => deleteRecyclingCenterController.handle(req, res));
+
+// --- USER PROTECTED ROUTES ---
+app.get('/recycling-centers', authMiddleware, (req, res) => viewRecyclingCentersController.handle(req, res));
+
+// --- MANAGER PROTECTED ROUTES ---
+app.put('/manager/recycling-centers/:id', managerAuthMiddleware, (req, res) => updateRecyclingCenterController.handle(req, res));
 app.get('/admin/disposal/stats', adminAuthMiddleware, (req, res) => getDisposalStatsController.handle(req, res));
 
 // --- CITIZEN PROTECTED ROUTES (Disposal Logs) ---
