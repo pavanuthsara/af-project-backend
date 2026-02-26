@@ -19,6 +19,9 @@ const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAu
 const categoryRoutes = require('../../interface_adapters/routes/categoryRoutes');
 const itemRoutes = require('../../interface_adapters/routes/itemRoutes');
 
+// Import quiz module routes
+const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
+
 // Load environment variables
 require('dotenv').config();
 
@@ -65,6 +68,9 @@ app.use('/api/items', itemRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/items', itemRoutes);
 
+// --- QUIZ MODULE ROUTES ---
+app.use('/api/quizzes', quizRoutes);
+
 // 404 HANDLER - (Must be after all valid routes)
 app.use((req, res) => {
   res.status(404).json({
@@ -76,7 +82,7 @@ app.use((req, res) => {
 // GLOBAL ERROR HANDLER (Must be the very last middleware)
 app.use((error, req, res, next) => {
   console.error('Error:', error.message);
-  
+
   if (error.name === 'ValidationError') {
     return res.status(400).json({ success: false, error: error.message });
   }
@@ -86,7 +92,7 @@ app.use((error, req, res, next) => {
   if (error.code === 11000) {
     return res.status(400).json({ success: false, error: 'Duplicate key error - resource already exists' });
   }
-  
+
   const statusCode = error.statusCode || 500;
   res.status(statusCode).json({
     success: false,
@@ -100,7 +106,7 @@ const PORT = process.env.PORT || 3000;
 const startServer = async () => {
   try {
     // Ensure DB connects BEFORE opening the port
-    await connectToDatabase(); 
+    await connectToDatabase();
     console.log('Database connected successfully');
 
     app.listen(PORT, () => {
@@ -109,7 +115,7 @@ const startServer = async () => {
   } catch (error) {
     console.error('Failed to start server:', error);
     // Exit with failure code so hosting environments know it crashed
-    process.exit(1); 
+    process.exit(1);
   }
 };
 
