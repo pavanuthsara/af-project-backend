@@ -15,7 +15,8 @@ class MongoDisposalActivityRepository extends DisposalActivityRepository {
       doc.quantity,
       doc.weight,
       doc.unit,
-      doc.timestamp
+      doc.timestamp,
+      doc.disposalGuideline || null
     );
   }
 
@@ -26,7 +27,8 @@ class MongoDisposalActivityRepository extends DisposalActivityRepository {
       quantity: disposalActivity.quantity,
       weight: disposalActivity.weight,
       unit: disposalActivity.unit,
-      timestamp: disposalActivity.timestamp
+      timestamp: disposalActivity.timestamp,
+      disposalGuideline: disposalActivity.disposalGuideline || null
     });
 
     const saved = await doc.save();

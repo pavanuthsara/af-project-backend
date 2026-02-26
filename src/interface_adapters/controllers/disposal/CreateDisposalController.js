@@ -5,7 +5,7 @@ const MongoWasteItemRepository = require('../../repositories/MongoWasteItemRepos
 class CreateDisposalController {
   async handle(req, res) {
     try {
-      const { wasteId, quantity, weight, unit } = req.body;
+      const { wasteId, quantity, weight, unit, disposalGuideline } = req.body;
       const userId = req.user.id; // From auth middleware
 
       const disposalActivityRepository = new MongoDisposalActivityRepository();
@@ -17,7 +17,8 @@ class CreateDisposalController {
         wasteId,
         quantity,
         weight,
-        unit
+        unit,
+        disposalGuideline || null
       );
 
       return res.status(201).json({

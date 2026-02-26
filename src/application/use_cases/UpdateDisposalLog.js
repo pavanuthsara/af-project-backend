@@ -43,6 +43,12 @@ class UpdateDisposalLog {
       }
     }
 
+    if (updates.disposalGuideline !== undefined) {
+      if (updates.disposalGuideline !== null && typeof updates.disposalGuideline !== 'string') {
+        throw new Error('Disposal guideline must be a string or null');
+      }
+    }
+
     const updatedLog = await this.disposalActivityRepository.update(logId, updates);
     return updatedLog;
   }

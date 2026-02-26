@@ -37,6 +37,11 @@ const DisposalActivitySchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
       index: true
+    },
+    disposalGuideline: {
+      type: String,
+      trim: true,
+      default: null
     }
   },
   {

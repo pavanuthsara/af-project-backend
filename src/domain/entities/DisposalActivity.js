@@ -1,5 +1,5 @@
 class DisposalActivity {
-  constructor(id, userId, wasteId, quantity, weight, unit, timestamp = new Date()) {
+  constructor(id, userId, wasteId, quantity, weight, unit, timestamp = new Date(), disposalGuideline = null) {
     this.id = id;
     this.userId = userId;
     this.wasteId = wasteId;
@@ -7,6 +7,7 @@ class DisposalActivity {
     this.weight = weight;
     this.unit = unit;
     this.timestamp = timestamp;
+    this.disposalGuideline = disposalGuideline;
 
     this.validate();
   }
@@ -47,8 +48,8 @@ class DisposalActivity {
   }
 
   // Factory method for creating new disposal activities
-  static create(userId, wasteId, quantity, weight, unit) {
-    return new DisposalActivity(null, userId, wasteId, quantity, weight, unit);
+  static create(userId, wasteId, quantity, weight, unit, disposalGuideline = null) {
+    return new DisposalActivity(null, userId, wasteId, quantity, weight, unit, new Date(), disposalGuideline);
   }
 }
 

@@ -4,7 +4,7 @@ class CreateDisposalLog {
     this.wasteItemRepository = wasteItemRepository;
   }
 
-  async execute(userId, wasteId, quantity, weight, unit) {
+  async execute(userId, wasteId, quantity, weight, unit, disposalGuideline = null) {
     // Validate inputs
     if (!userId || !wasteId || !quantity || !weight || !unit) {
       throw new Error('All fields are required');
@@ -34,7 +34,8 @@ class CreateDisposalLog {
       quantity,
       weight,
       unit,
-      new Date()
+      new Date(),
+      disposalGuideline
     );
 
     const savedActivity = await this.disposalActivityRepository.save(disposalActivity);
