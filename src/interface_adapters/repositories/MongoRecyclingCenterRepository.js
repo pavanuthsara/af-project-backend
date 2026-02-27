@@ -37,6 +37,12 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     return this.toEntity(mongoRecyclingCenter);
   }
 
+  async findById(id) {
+    const mongoRecyclingCenter = await RecyclingCenterModel.findById(id);
+    if (!mongoRecyclingCenter) return null;
+    return this.toEntity(mongoRecyclingCenter);
+  }
+
   async deleteById(id) {
     const deletedCenter = await RecyclingCenterModel.findByIdAndDelete(id);
     return Boolean(deletedCenter);
@@ -71,6 +77,44 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
       }
       throw error;
     }
+  }
+
+  async search(filters) {
+    const and = [];
+    const acceptedWasteTypes = Array.isArray(filters.acceptedWasteTypes) ? filters.acceptedWasteTypes : [];
+    const addressKeywords = Array.isArray(filters.addressKeywords) ? filters.addressKeywords : [];
+
+    if (acceptedWasteTypes.length > 0) {
+      and.push({
+        $or: acceptedWasteTypes.map((type) => ({
+          acceptedWasteTypes: { $elemMatch: { $regex: `^${this.escapeRegex(type)}$`, $options: 'i' } },
+        })),
+      });
+    }
+
+    if (filters.name) {
+      and.push({ name: new RegExp(this.escapeRegex(filters.name), 'i') });
+    }
+
+    const addressTerms = [];
+    if (filters.city) addressTerms.push(filters.city);
+    addressKeywords.forEach((term) => addressTerms.push(term));
+
+    if (addressTerms.length > 0) {
+      and.push({
+        $or: addressTerms.map((term) => ({
+          address: new RegExp(this.escapeRegex(term), 'i'),
+        })),
+      });
+    }
+
+    const query = and.length > 0 ? { $and: and } : {};
+    const mongoRecyclingCenters = await RecyclingCenterModel.find(query).sort({ name: 1 });
+    return mongoRecyclingCenters.map((mongoRecyclingCenter) => this.toEntity(mongoRecyclingCenter));
+  }
+
+  escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   toEntity(mongoRecyclingCenter) {

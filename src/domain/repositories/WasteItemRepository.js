@@ -15,6 +15,10 @@ class WasteItemRepository {
     throw new Error('findByCategory method must be implemented');
   }
 
+  async findByIdWithCategory(id) {
+    throw new Error('findByIdWithCategory method must be implemented');
+  }
+
   async update(id, updates) {
     throw new Error('update method must be implemented');
   }

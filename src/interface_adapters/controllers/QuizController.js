@@ -1,5 +1,6 @@
 const QuizService = require('../../application/services/QuizService');
 const TranslationService = require('../../application/services/TranslationService');
+const ExplanationService = require('../../application/services/ExplanationService');
 
 /**
  * QuizController
@@ -8,7 +9,8 @@ const TranslationService = require('../../application/services/TranslationServic
  */
 class QuizController {
     constructor() {
-        this.quizService = new QuizService();
+        this.explanationService = new ExplanationService();
+        this.quizService = new QuizService({ explanationService: this.explanationService });
         this.translationService = new TranslationService();
     }
 

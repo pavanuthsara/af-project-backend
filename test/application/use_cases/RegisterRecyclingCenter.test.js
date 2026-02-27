@@ -4,6 +4,7 @@ const RecyclingCenter = require('../../../src/domain/entities/RecyclingCenter');
 describe('RegisterRecyclingCenter Use Case', () => {
   let registerRecyclingCenter;
   let mockRecyclingCenterRepository;
+  let mockWasteTypeValidationService;
 
   const validPayload = {
     name: 'Green Valley Recycling Hub',
@@ -21,10 +22,19 @@ describe('RegisterRecyclingCenter Use Case', () => {
       save: jest.fn(),
     };
 
-    registerRecyclingCenter = new RegisterRecyclingCenter(mockRecyclingCenterRepository);
+    mockWasteTypeValidationService = {
+      validateAcceptedWasteTypes: jest.fn(),
+    };
+
+    registerRecyclingCenter = new RegisterRecyclingCenter(
+      mockRecyclingCenterRepository,
+      mockWasteTypeValidationService
+    );
   });
 
   test('should register a recycling center with valid data', async () => {
+    const canonicalWasteTypes = ['Plastic', 'Paper', 'Glass'];
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockResolvedValue(canonicalWasteTypes);
     mockRecyclingCenterRepository.findByNameAndAddress.mockResolvedValue(null);
     mockRecyclingCenterRepository.save.mockResolvedValue(
       new RecyclingCenter(
@@ -32,7 +42,7 @@ describe('RegisterRecyclingCenter Use Case', () => {
         validPayload.name,
         validPayload.address,
         validPayload.location,
-        validPayload.acceptedWasteTypes,
+        canonicalWasteTypes,
         validPayload.operatingHours,
         validPayload.maxCapacityKg,
         validPayload.currentLoadKg
@@ -45,12 +55,15 @@ describe('RegisterRecyclingCenter Use Case', () => {
       validPayload.name,
       validPayload.address
     );
+    expect(mockWasteTypeValidationService.validateAcceptedWasteTypes)
+      .toHaveBeenCalledWith(validPayload.acceptedWasteTypes);
     expect(mockRecyclingCenterRepository.save).toHaveBeenCalled();
     expect(result.id).toBe('center-1');
     expect(result.name).toBe(validPayload.name);
   });
 
   test('should throw 409 if recycling center already exists', async () => {
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockResolvedValue(validPayload.acceptedWasteTypes);
     mockRecyclingCenterRepository.findByNameAndAddress.mockResolvedValue(
       new RecyclingCenter('center-1', validPayload.name, validPayload.address, validPayload.location, [], '', 1, 0)
     );
@@ -60,6 +73,20 @@ describe('RegisterRecyclingCenter Use Case', () => {
       statusCode: 409,
     });
 
+    expect(mockRecyclingCenterRepository.save).not.toHaveBeenCalled();
+  });
+
+  test('should throw 400 when acceptedWasteTypes contain invalid types', async () => {
+    const invalidError = new Error('Invalid waste types: unknown');
+    invalidError.statusCode = 400;
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockRejectedValue(invalidError);
+
+    await expect(registerRecyclingCenter.execute(validPayload)).rejects.toMatchObject({
+      message: 'Invalid waste types: unknown',
+      statusCode: 400,
+    });
+
+    expect(mockRecyclingCenterRepository.findByNameAndAddress).not.toHaveBeenCalled();
     expect(mockRecyclingCenterRepository.save).not.toHaveBeenCalled();
   });
 
