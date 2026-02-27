@@ -1,0 +1,45 @@
+config:
+  # The base URL of your Express API
+  target: "http://localhost:3000"
+  
+  # Define the load phases
+  phases:
+    - duration: 30       # Run this phase for 30 seconds
+      arrivalRate: 5     # 5 new virtual users per second
+      name: "Warm up the API"
+      
+    - duration: 60       # Run for 60 seconds
+      arrivalRate: 5     # Start at 5 users per second
+      rampTo: 50         # Gradually increase to 50 users per second
+      name: "Ramp up load"
+      
+    - duration: 120      # Run for 2 minutes
+      arrivalRate: 50    # Sustain 50 users per second
+      name: "Sustained peak load"
+
+  # Optional: Define payloads if you want to use dynamic data from a CSV
+  # payload:
+  #   path: "users.csv"
+  #   fields:
+  #     - "username"
+  #     - "email"
+
+scenarios:
+  # Define what a virtual user does
+  - name: "Typical User Journey: Fetch and Create"
+    flow:
+      # 1. User fetches the list of users
+      - get:
+          url: "/api/users"
+          
+      # Pause for 1 second to simulate human reading time
+      - think: 1
+      
+      # 2. User creates a new user profile
+      - post:
+          url: "/api/users"
+          json:
+            username: "testuser_{{ $randomString() }}"
+            email: "test_{{ $randomString() }}@example.com"
+            # $randomString() is a built-in Artillery variable
+            
