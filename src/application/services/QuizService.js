@@ -10,6 +10,13 @@ const User = require('../../interface_adapters/schemas/UserSchema');
  * Follows the same pattern as WasteService.
  */
 class QuizService {
+    /**
+     * @param {Object} [options]
+     * @param {Object} [options.explanationService] - ExplanationService instance for AI explanations
+     */
+    constructor({ explanationService } = {}) {
+        this.explanationService = explanationService || null;
+    }
 
     // ─── Admin Methods ───────────────────────────────────────────
 
@@ -193,7 +200,9 @@ class QuizService {
         questions.forEach(q => {
             truthMap[q._id.toString()] = {
                 correctAnswer: q.correctAnswer,
-                explanation: q.explanation
+                explanation: q.explanation,
+                questionText: q.questionText,
+                options: q.options
             };
         });
 
@@ -264,7 +273,37 @@ class QuizService {
         });
         await attempt.save();
 
-        // Step 6: Respond
+        // Step 6: Generate AI explanations for wrong answers (if service available)
+        if (this.explanationService && wrongAnswerExplanations.length > 0) {
+            try {
+                const wrongAnswerData = wrongAnswerExplanations.map(wa => {
+                    const truth = truthMap[wa.questionId];
+                    return {
+                        questionText: truth.questionText,
+                        options: truth.options,
+                        userSelected: submittedAnswers.find(
+                            a => a.questionId === wa.questionId
+                        ).selectedOption,
+                        correctAnswer: wa.correctAnswer
+                    };
+                });
+
+                const aiExplanations = await this.explanationService.generateExplanations(
+                    wrongAnswerData
+                );
+
+                // Replace static explanations with AI ones (keep static as fallback)
+                for (let i = 0; i < wrongAnswerExplanations.length; i++) {
+                    if (aiExplanations[i]) {
+                        wrongAnswerExplanations[i].explanation = aiExplanations[i];
+                    }
+                }
+            } catch {
+                // Graceful degradation: keep the original static explanations
+            }
+        }
+
+        // Step 7: Respond
         return {
             score: scorePercentage,
             correctAnswers: correctCount,
