@@ -1,0 +1,490 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.Typical User Journey: Fetch and Create": 7800,
+      "vusers.created": 7800,
+      "http.requests": 7800,
+      "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 7799,
+      "errors.ECONNREFUSED": 7799,
+      "vusers.failed": 7800,
+      "plugins.metrics-by-endpoint./api/users.errors.HPE_INVALID_CONSTANT": 1,
+      "errors.HPE_INVALID_CONSTANT": 1
+    },
+    "rates": {
+      "http.request_rate": 45
+    },
+    "firstCounterAt": 1772167794845,
+    "lastCounterAt": 1772168005488,
+    "firstMetricAt": 1772167794845,
+    "lastMetricAt": 1772168005488,
+    "period": 1772168000000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 28,
+        "vusers.created": 28,
+        "http.requests": 28,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 28,
+        "errors.ECONNREFUSED": 28,
+        "vusers.failed": 28
+      },
+      "rates": {
+        "http.request_rate": 5
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167794845,
+      "lastCounterAt": 1772167799974,
+      "firstMetricAt": 1772167794845,
+      "lastMetricAt": 1772167799974,
+      "period": "1772167790000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 50,
+        "vusers.created": 50,
+        "http.requests": 50,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 50,
+        "errors.ECONNREFUSED": 50,
+        "vusers.failed": 50
+      },
+      "rates": {
+        "http.request_rate": 5
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167800025,
+      "lastCounterAt": 1772167809973,
+      "firstMetricAt": 1772167800025,
+      "lastMetricAt": 1772167809973,
+      "period": "1772167800000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 50,
+        "vusers.created": 50,
+        "http.requests": 50,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 50,
+        "errors.ECONNREFUSED": 50,
+        "vusers.failed": 50
+      },
+      "rates": {
+        "http.request_rate": 5
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167810025,
+      "lastCounterAt": 1772167819974,
+      "firstMetricAt": 1772167810025,
+      "lastMetricAt": 1772167819974,
+      "period": "1772167810000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 57,
+        "vusers.created": 57,
+        "http.requests": 57,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 57,
+        "errors.ECONNREFUSED": 57,
+        "vusers.failed": 57
+      },
+      "rates": {
+        "http.request_rate": 9
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167820025,
+      "lastCounterAt": 1772167829993,
+      "firstMetricAt": 1772167820025,
+      "lastMetricAt": 1772167829993,
+      "period": "1772167820000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 121,
+        "vusers.created": 121,
+        "http.requests": 121,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 121,
+        "errors.ECONNREFUSED": 121,
+        "vusers.failed": 121
+      },
+      "rates": {
+        "http.request_rate": 18
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167830052,
+      "lastCounterAt": 1772167839938,
+      "firstMetricAt": 1772167830052,
+      "lastMetricAt": 1772167839938,
+      "period": "1772167830000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 199,
+        "vusers.created": 199,
+        "http.requests": 199,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 199,
+        "errors.ECONNREFUSED": 199,
+        "vusers.failed": 199
+      },
+      "rates": {
+        "http.request_rate": 21
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167840038,
+      "lastCounterAt": 1772167849978,
+      "firstMetricAt": 1772167840038,
+      "lastMetricAt": 1772167849978,
+      "period": "1772167840000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 275,
+        "vusers.created": 275,
+        "http.requests": 275,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 275,
+        "errors.ECONNREFUSED": 275,
+        "vusers.failed": 275
+      },
+      "rates": {
+        "http.request_rate": 29
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167850023,
+      "lastCounterAt": 1772167859967,
+      "firstMetricAt": 1772167850023,
+      "lastMetricAt": 1772167859967,
+      "period": "1772167850000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 349,
+        "vusers.created": 349,
+        "http.requests": 349,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 349,
+        "errors.ECONNREFUSED": 349,
+        "vusers.failed": 349
+      },
+      "rates": {
+        "http.request_rate": 36
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167860074,
+      "lastCounterAt": 1772167869999,
+      "firstMetricAt": 1772167860074,
+      "lastMetricAt": 1772167869999,
+      "period": "1772167860000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 428,
+        "vusers.created": 428,
+        "http.requests": 428,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 427,
+        "errors.ECONNREFUSED": 427,
+        "vusers.failed": 428,
+        "plugins.metrics-by-endpoint./api/users.errors.HPE_INVALID_CONSTANT": 1,
+        "errors.HPE_INVALID_CONSTANT": 1
+      },
+      "rates": {
+        "http.request_rate": 44
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167870008,
+      "lastCounterAt": 1772167879992,
+      "firstMetricAt": 1772167870008,
+      "lastMetricAt": 1772167879992,
+      "period": "1772167870000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 491,
+        "vusers.created": 491,
+        "http.requests": 491,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 491,
+        "errors.ECONNREFUSED": 491,
+        "vusers.failed": 491
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167880049,
+      "lastCounterAt": 1772167889986,
+      "firstMetricAt": 1772167880049,
+      "lastMetricAt": 1772167889986,
+      "period": "1772167880000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167890023,
+      "lastCounterAt": 1772167899986,
+      "firstMetricAt": 1772167890023,
+      "lastMetricAt": 1772167899986,
+      "period": "1772167890000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167900023,
+      "lastCounterAt": 1772167909986,
+      "firstMetricAt": 1772167900023,
+      "lastMetricAt": 1772167909986,
+      "period": "1772167900000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167910023,
+      "lastCounterAt": 1772167919986,
+      "firstMetricAt": 1772167910023,
+      "lastMetricAt": 1772167919986,
+      "period": "1772167910000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167920023,
+      "lastCounterAt": 1772167929986,
+      "firstMetricAt": 1772167920023,
+      "lastMetricAt": 1772167929986,
+      "period": "1772167920000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167930023,
+      "lastCounterAt": 1772167939986,
+      "firstMetricAt": 1772167930023,
+      "lastMetricAt": 1772167939986,
+      "period": "1772167930000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167940023,
+      "lastCounterAt": 1772167949987,
+      "firstMetricAt": 1772167940023,
+      "lastMetricAt": 1772167949987,
+      "period": "1772167940000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167950024,
+      "lastCounterAt": 1772167959987,
+      "firstMetricAt": 1772167950024,
+      "lastMetricAt": 1772167959987,
+      "period": "1772167950000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167960024,
+      "lastCounterAt": 1772167969986,
+      "firstMetricAt": 1772167960024,
+      "lastMetricAt": 1772167969986,
+      "period": "1772167960000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167970024,
+      "lastCounterAt": 1772167979987,
+      "firstMetricAt": 1772167970024,
+      "lastMetricAt": 1772167979987,
+      "period": "1772167970000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167980024,
+      "lastCounterAt": 1772167989988,
+      "firstMetricAt": 1772167980024,
+      "lastMetricAt": 1772167989988,
+      "period": "1772167980000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 500,
+        "vusers.created": 500,
+        "http.requests": 500,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 500,
+        "errors.ECONNREFUSED": 500,
+        "vusers.failed": 500
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772167990024,
+      "lastCounterAt": 1772167999987,
+      "firstMetricAt": 1772167990024,
+      "lastMetricAt": 1772167999987,
+      "period": "1772167990000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Typical User Journey: Fetch and Create": 252,
+        "vusers.created": 252,
+        "http.requests": 252,
+        "plugins.metrics-by-endpoint./api/users.errors.ECONNREFUSED": 252,
+        "errors.ECONNREFUSED": 252,
+        "vusers.failed": 252
+      },
+      "rates": {
+        "http.request_rate": 50
+      },
+      "http.request_rate": null,
+      "firstCounterAt": 1772168000024,
+      "lastCounterAt": 1772168005488,
+      "firstMetricAt": 1772168000024,
+      "lastMetricAt": 1772168005488,
+      "period": "1772168000000",
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}

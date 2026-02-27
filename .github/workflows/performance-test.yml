@@ -1,0 +1,115 @@
+name: Performance Test
+
+# Runs on pull requests targeting main
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+
+    # Spin up a MongoDB container for the app
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      # 1. Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      # 3. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "pnpm"
+
+      # 4. Install project dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. Install Artillery globally
+      - name: Install Artillery
+        run: npm install -g artillery
+
+      # 6. Seed a test user for authenticated scenarios
+      - name: Seed test user
+        env:
+          MONGODB_URI: mongodb://localhost:27017/perf-test-db
+          JWT_SECRET: perf-test-secret
+        run: |
+          node -e "
+            const mongoose = require('mongoose');
+            const bcrypt = require('bcryptjs');
+
+            async function seed() {
+              await mongoose.connect(process.env.MONGODB_URI);
+              const userSchema = new mongoose.Schema({
+                name: String,
+                email: { type: String, unique: true },
+                password: String,
+                role: { type: String, default: 'user' }
+              });
+              const User = mongoose.model('User', userSchema);
+              const hash = await bcrypt.hash('yourpassword', 10);
+              await User.findOneAndUpdate(
+                { email: 'damith@example.com' },
+                { name: 'damith', email: 'damith@example.com', password: hash, role: 'user' },
+                { upsert: true }
+              );
+              console.log('Test user seeded');
+              await mongoose.disconnect();
+            }
+            seed().catch(e => { console.error(e); process.exit(1); });
+          "
+
+      # 7. Start the Express server in the background
+      - name: Start server
+        env:
+          MONGODB_URI: mongodb://localhost:27017/perf-test-db
+          JWT_SECRET: perf-test-secret
+          PORT: 3000
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+        run: |
+          node src/infrastructure/webserver/server.js &
+          echo "Waiting for server to be ready..."
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:3000/api/categories > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i - server not ready yet..."
+            sleep 2
+          done
+
+      # 8. Run Artillery performance test
+      - name: Run Artillery load test
+        run: |
+          artillery run artillery-config.yml --output .github/workflows/report.json
+
+      # 9. Generate HTML report
+      - name: Generate Artillery report
+        if: always()
+        run: |
+          artillery report .github/workflows/report.json --output .github/workflows/report.html || true
+
+      # 10. Upload test results as artifacts
+      - name: Upload performance report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artillery-performance-report
+          path: |
+            .github/workflows/report.json
+            .github/workflows/report.html
+          retention-days: 30
