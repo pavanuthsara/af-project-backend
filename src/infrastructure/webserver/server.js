@@ -54,6 +54,23 @@ app.post('/signup', (req, res) => signUpController.handle(req, res));
 app.post('/login', (req, res) => loginController.handle(req, res));
 app.post('/admin/login', (req, res) => adminLoginController.handle(req, res));
 
+// --- PROTECTED COMMON ROUTES ---
+app.get('/profile', authMiddleware, (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user
+  });
+});
+
+app.post('/logout', (req, res) => {
+  // In a stateless JWT system, "logging out" is primarily a client-side action (deleting the token).
+  // This endpoint serves as a standard way for the client to signal it's finished.
+  res.status(200).json({
+    success: true,
+    message: 'Logged out successfully. Please clear your local token.'
+  });
+});
+
 // --- ADMIN PROTECTED ROUTES ---
 app.post('/admin/register', adminAuthMiddleware, (req, res) => registerAdminController.handle(req, res));
 app.post('/admin/recycling-centers', adminAuthMiddleware, (req, res) => registerRecyclingCenterController.handle(req, res));
