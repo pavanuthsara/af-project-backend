@@ -53,4 +53,6 @@ jobs:
 
       # 6. Run Tests
       - name: Run Tests
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
         run: pnpm run test

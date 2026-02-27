@@ -1,4 +1,5 @@
 const QuizService = require('../../application/services/QuizService');
+const TranslationService = require('../../application/services/TranslationService');
 
 /**
  * QuizController
@@ -8,6 +9,7 @@ const QuizService = require('../../application/services/QuizService');
 class QuizController {
     constructor() {
         this.quizService = new QuizService();
+        this.translationService = new TranslationService();
     }
 
     // ─── Admin Endpoints ─────────────────────────────────────────
@@ -73,7 +75,7 @@ class QuizController {
         try {
             const { questionId } = req.params;
             const { questionText, options, correctAnswer, explanation, imageUrl } = req.body;
-            
+
             // Only allow specific fields to be updated
             const updateData = {};
             if (questionText !== undefined) updateData.questionText = questionText;
@@ -81,7 +83,7 @@ class QuizController {
             if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
             if (explanation !== undefined) updateData.explanation = explanation;
             if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
-            
+
             const updatedQuestion = await this.quizService.updateQuestion(questionId, updateData);
 
             res.status(200).json({
@@ -138,7 +140,21 @@ class QuizController {
     getQuizForPlay = async (req, res, next) => {
         try {
             const { quizId } = req.params;
+            const { lang } = req.query;
             const result = await this.quizService.getQuizForPlay(quizId);
+
+            // If a language is specified (and it's not English), translate the content
+            if (lang && lang !== 'en') {
+                const translatedResult = await this.translationService.translateQuizContent(
+                    result.quiz,
+                    result.questions,
+                    lang
+                );
+                return res.status(200).json({
+                    success: true,
+                    data: translatedResult,
+                });
+            }
 
             res.status(200).json({
                 success: true,
@@ -168,19 +184,19 @@ class QuizController {
             // Validate each answer object structure
             for (let i = 0; i < answers.length; i++) {
                 const answer = answers[i];
-                
+
                 if (!answer || typeof answer !== 'object') {
                     const error = new Error(`Answer at index ${i} must be an object`);
                     error.statusCode = 400;
                     throw error;
                 }
-                
+
                 if (!answer.questionId || typeof answer.questionId !== 'string') {
                     const error = new Error(`Answer at index ${i} must have a valid questionId (string)`);
                     error.statusCode = 400;
                     throw error;
                 }
-                
+
                 if (!answer.selectedOption || typeof answer.selectedOption !== 'string') {
                     const error = new Error(`Answer at index ${i} must have a valid selectedOption (string)`);
                     error.statusCode = 400;
