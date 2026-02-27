@@ -182,6 +182,32 @@ No body needed. **Expected:** `200 OK` with randomized questions.
 
 > ✅ **Security Check:** Verify that `correctAnswer` and `explanation` are **NOT** present in the response. This is the key security feature!
 
+### 6a. Multi-Language Support (Sinhala & Tamil)
+
+Add a `?lang` query parameter to get quiz questions translated on-the-fly using the Gemini API.
+
+**Sinhala:**
+```
+GET /api/quizzes/<QUIZ_ID>/play?lang=si
+Authorization: Bearer <USER_TOKEN>
+```
+
+**Tamil:**
+```
+GET /api/quizzes/<QUIZ_ID>/play?lang=ta
+Authorization: Bearer <USER_TOKEN>
+```
+
+**Expected:** `200 OK` — same structure as the English response, but `questionText`, `options`, quiz `title`, and `description` are translated.
+
+> ⚠️ **Note:** `correctAnswer` is **never** translated — grading always uses the original English values. Omit `?lang` or use `?lang=en` to get the default English content.
+
+| Language | Code | Example |
+|----------|------|---------|
+| English (default) | — | `GET /api/quizzes/:id/play` |
+| Sinhala | `si` | `GET /api/quizzes/:id/play?lang=si` |
+| Tamil | `ta` | `GET /api/quizzes/:id/play?lang=ta` |
+
 ---
 
 ## 7. User — Submit Quiz Answers
@@ -269,6 +295,8 @@ No body needed. **Expected:** `200 OK`
 | 5 | POST | `/api/quizzes/:quizId/questions` ×3 | Admin |
 | 6 | GET | `/api/quizzes` | User |
 | 7 | GET | `/api/quizzes/:quizId/play` | User |
+| 7a | GET | `/api/quizzes/:quizId/play?lang=si` | User |
+| 7b | GET | `/api/quizzes/:quizId/play?lang=ta` | User |
 | 8 | POST | `/api/quizzes/:quizId/submit` | User |
 | 9 | GET | `/api/quizzes/certificates` | User |
 
@@ -284,3 +312,5 @@ No body needed. **Expected:** `200 OK`
 | Submit empty answers array | `400 Answers array is required` |
 | Submit to non-existent quiz | `404 Quiz not found` |
 | Duplicate quiz title | `400 Quiz title already exists` |
+| Play quiz with unsupported language (`?lang=fr`) | `400 Unsupported language` |
+| Translation API failure | `500 Translation failed` |

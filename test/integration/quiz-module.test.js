@@ -2,6 +2,10 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const express = require('express');
+
+// Mock TranslationService to prevent Groq SDK from requiring a real API key
+jest.mock('../../src/application/services/TranslationService');
+
 const QuizController = require('../../src/interface_adapters/controllers/QuizController');
 const Quiz = require('../../src/interface_adapters/schemas/QuizSchema');
 const Question = require('../../src/interface_adapters/schemas/QuestionSchema');
