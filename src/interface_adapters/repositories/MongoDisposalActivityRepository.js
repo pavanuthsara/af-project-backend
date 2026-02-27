@@ -16,7 +16,10 @@ class MongoDisposalActivityRepository extends DisposalActivityRepository {
       doc.weight,
       doc.unit,
       doc.timestamp,
-      doc.disposalGuideline || null
+      doc.disposalGuideline || null,
+      doc.co2Saved   ?? null,
+      doc.co2Source  || null,
+      doc.disposalMethod || null
     );
   }
 
@@ -28,7 +31,10 @@ class MongoDisposalActivityRepository extends DisposalActivityRepository {
       weight: disposalActivity.weight,
       unit: disposalActivity.unit,
       timestamp: disposalActivity.timestamp,
-      disposalGuideline: disposalActivity.disposalGuideline || null
+      disposalGuideline: disposalActivity.disposalGuideline || null,
+      co2Saved:      disposalActivity.co2Saved      ?? null,
+      co2Source:     disposalActivity.co2Source     || null,
+      disposalMethod: disposalActivity.disposalMethod || null,
     });
 
     const saved = await doc.save();
