@@ -26,6 +26,9 @@ const managerAuthMiddleware = require('../../interface_adapters/middleware/Manag
 // Import quiz module routes
 const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
 
+// Import AI routes
+const aiRoutes = require('../../interface_adapters/routes/aiRoutes');
+
 // Load environment variables
 require('dotenv').config();
 
@@ -101,6 +104,9 @@ app.use('/items', itemRoutes);
 
 // --- QUIZ MODULE ROUTES ---
 app.use('/api/quizzes', quizRoutes);
+
+// --- AI MODULE ROUTES ---
+app.use('/api/ai', aiRoutes);
 
 // 404 HANDLER - (Must be after all valid routes)
 app.use((req, res) => {
