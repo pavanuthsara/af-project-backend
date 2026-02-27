@@ -147,8 +147,10 @@ describe('TranslationService', () => {
 
             // Verify the prompt contains JSON array
             const callArgs = mockCreate.mock.calls[0][0];
-            expect(callArgs.messages[0].content).toContain('JSON array');
-            expect(callArgs.messages[0].content).toContain('Sinhala');
+            // messages[0] is the system prompt, messages[1] is the user prompt
+            expect(callArgs.messages[0].role).toBe('system');
+            expect(callArgs.messages[1].content).toContain('JSON array');
+            expect(callArgs.messages[1].content).toContain('Sinhala');
 
             // Verify translated content
             expect(result.quiz.title).toBe('ප්‍රතිචක්‍රීකරණ මූලික කරුණු');
