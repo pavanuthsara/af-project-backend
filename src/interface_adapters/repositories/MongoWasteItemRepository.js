@@ -56,6 +56,24 @@ class MongoWasteItemRepository extends WasteItemRepository {
     return docs.map(doc => this._toDomainEntity(doc));
   }
 
+  /**
+   * Finds a waste item by ID and populates its category name.
+   * Returns the domain entity extended with `categoryName`.
+   */
+  async findByIdWithCategory(id) {
+    try {
+      const doc = await WasteItemSchema.findById(id).populate('category', 'name');
+      if (!doc) return null;
+      return {
+        ...this._toDomainEntity(doc),
+        categoryName: doc.category ? doc.category.name : null,
+      };
+    } catch (error) {
+      if (error.name === 'CastError') return null;
+      throw error;
+    }
+  }
+
   async update(id, updates) {
     try {
       const doc = await WasteItemSchema.findByIdAndUpdate(

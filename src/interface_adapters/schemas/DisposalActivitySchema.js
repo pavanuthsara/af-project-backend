@@ -37,6 +37,25 @@ const DisposalActivitySchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
       index: true
+    },
+    disposalGuideline: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    co2Saved: {
+      type: Number,
+      default: null
+    },
+    co2Source: {
+      type: String,
+      enum: ['climatiq', 'epa_warm', null],
+      default: null
+    },
+    disposalMethod: {
+      type: String,
+      enum: ['recycled', 'composted', 'landfill', null],
+      default: null
     }
   },
   {
