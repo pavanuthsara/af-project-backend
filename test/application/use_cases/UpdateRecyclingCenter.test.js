@@ -4,6 +4,7 @@ const RecyclingCenter = require('../../../src/domain/entities/RecyclingCenter');
 describe('UpdateRecyclingCenter Use Case', () => {
   let updateRecyclingCenter;
   let mockRecyclingCenterRepository;
+  let mockWasteTypeValidationService;
 
   const validId = '507f191e810c19729de860ea';
   const validPayload = {
@@ -21,17 +22,27 @@ describe('UpdateRecyclingCenter Use Case', () => {
       updateById: jest.fn(),
     };
 
-    updateRecyclingCenter = new UpdateRecyclingCenter(mockRecyclingCenterRepository);
+    mockWasteTypeValidationService = {
+      validateAcceptedWasteTypes: jest.fn(),
+    };
+
+    updateRecyclingCenter = new UpdateRecyclingCenter(
+      mockRecyclingCenterRepository,
+      mockWasteTypeValidationService
+    );
   });
 
   test('should update a recycling center with valid data', async () => {
+    const canonicalWasteTypes = ['Plastic', 'Paper', 'Glass'];
+    const payloadWithCanonicalTypes = { ...validPayload, acceptedWasteTypes: canonicalWasteTypes };
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockResolvedValue(canonicalWasteTypes);
     mockRecyclingCenterRepository.updateById.mockResolvedValue(
       new RecyclingCenter(
         validId,
         validPayload.name,
         validPayload.address,
         validPayload.location,
-        validPayload.acceptedWasteTypes,
+        canonicalWasteTypes,
         validPayload.operatingHours,
         validPayload.maxCapacityKg,
         validPayload.currentLoadKg
@@ -40,7 +51,9 @@ describe('UpdateRecyclingCenter Use Case', () => {
 
     const result = await updateRecyclingCenter.execute(validId, validPayload);
 
-    expect(mockRecyclingCenterRepository.updateById).toHaveBeenCalledWith(validId, validPayload);
+    expect(mockWasteTypeValidationService.validateAcceptedWasteTypes)
+      .toHaveBeenCalledWith(validPayload.acceptedWasteTypes);
+    expect(mockRecyclingCenterRepository.updateById).toHaveBeenCalledWith(validId, payloadWithCanonicalTypes);
     expect(result.id).toBe(validId);
     expect(result.name).toBe(validPayload.name);
   });
@@ -51,6 +64,7 @@ describe('UpdateRecyclingCenter Use Case', () => {
       statusCode: 400,
     });
 
+    expect(mockWasteTypeValidationService.validateAcceptedWasteTypes).not.toHaveBeenCalled();
     expect(mockRecyclingCenterRepository.updateById).not.toHaveBeenCalled();
   });
 
@@ -74,6 +88,7 @@ describe('UpdateRecyclingCenter Use Case', () => {
   });
 
   test('should throw 404 when recycling center does not exist', async () => {
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockResolvedValue(validPayload.acceptedWasteTypes);
     mockRecyclingCenterRepository.updateById.mockResolvedValue(null);
 
     await expect(updateRecyclingCenter.execute(validId, validPayload)).rejects.toMatchObject({
@@ -83,6 +98,7 @@ describe('UpdateRecyclingCenter Use Case', () => {
   });
 
   test('should propagate repository duplicate error', async () => {
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockResolvedValue(validPayload.acceptedWasteTypes);
     const duplicateError = new Error('Recycling center already exists');
     duplicateError.statusCode = 409;
     mockRecyclingCenterRepository.updateById.mockRejectedValue(duplicateError);
@@ -91,5 +107,18 @@ describe('UpdateRecyclingCenter Use Case', () => {
       message: 'Recycling center already exists',
       statusCode: 409,
     });
+  });
+
+  test('should throw 400 when acceptedWasteTypes contain invalid types', async () => {
+    const invalidError = new Error('Invalid waste types: unknown');
+    invalidError.statusCode = 400;
+    mockWasteTypeValidationService.validateAcceptedWasteTypes.mockRejectedValue(invalidError);
+
+    await expect(updateRecyclingCenter.execute(validId, validPayload)).rejects.toMatchObject({
+      message: 'Invalid waste types: unknown',
+      statusCode: 400,
+    });
+
+    expect(mockRecyclingCenterRepository.updateById).not.toHaveBeenCalled();
   });
 });

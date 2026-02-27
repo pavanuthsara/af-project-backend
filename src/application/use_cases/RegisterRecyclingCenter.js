@@ -1,8 +1,10 @@
 const RecyclingCenter = require('../../domain/entities/RecyclingCenter');
+const WasteTypeValidationService = require('../services/WasteTypeValidationService');
 
 class RegisterRecyclingCenter {
-  constructor(recyclingCenterRepository) {
+  constructor(recyclingCenterRepository, wasteTypeValidationService = new WasteTypeValidationService()) {
     this.recyclingCenterRepository = recyclingCenterRepository;
+    this.wasteTypeValidationService = wasteTypeValidationService;
   }
 
   async execute(data) {
@@ -26,6 +28,9 @@ class RegisterRecyclingCenter {
       currentLoadKg,
     });
 
+    const canonicalWasteTypes = await this.wasteTypeValidationService
+      .validateAcceptedWasteTypes(acceptedWasteTypes);
+
     const existingCenter = await this.recyclingCenterRepository.findByNameAndAddress(name, address);
     if (existingCenter) {
       const error = new Error('Recycling center already exists');
@@ -38,7 +43,7 @@ class RegisterRecyclingCenter {
       name,
       address,
       location,
-      acceptedWasteTypes,
+      canonicalWasteTypes,
       operatingHours,
       maxCapacityKg,
       currentLoadKg

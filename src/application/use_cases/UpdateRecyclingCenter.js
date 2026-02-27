@@ -1,6 +1,9 @@
+const WasteTypeValidationService = require('../services/WasteTypeValidationService');
+
 class UpdateRecyclingCenter {
-  constructor(recyclingCenterRepository) {
+  constructor(recyclingCenterRepository, wasteTypeValidationService = new WasteTypeValidationService()) {
     this.recyclingCenterRepository = recyclingCenterRepository;
+    this.wasteTypeValidationService = wasteTypeValidationService;
   }
 
   async execute(id, data) {
@@ -11,8 +14,11 @@ class UpdateRecyclingCenter {
     }
 
     this.validateInput(data);
+    const canonicalWasteTypes = await this.wasteTypeValidationService
+      .validateAcceptedWasteTypes(data.acceptedWasteTypes);
+    const payload = { ...data, acceptedWasteTypes: canonicalWasteTypes };
 
-    const updatedCenter = await this.recyclingCenterRepository.updateById(id, data);
+    const updatedCenter = await this.recyclingCenterRepository.updateById(id, payload);
 
     if (!updatedCenter) {
       const error = new Error('Recycling center not found');

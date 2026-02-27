@@ -15,6 +15,8 @@ const DeleteDisposalController = require('../../interface_adapters/controllers/d
 const UpdateRecyclingCenterController = require('../../interface_adapters/controllers/UpdateRecyclingCenterController');
 const ViewRecyclingCentersController = require('../../interface_adapters/controllers/ViewRecyclingCentersController');
 const SearchRecyclingCentersController = require('../../interface_adapters/controllers/SearchRecyclingCentersController');
+const GetRecyclingCentersByWasteTypeController = require('../../interface_adapters/controllers/GetRecyclingCentersByWasteTypeController');
+const GetRecyclingCenterByIdController = require('../../interface_adapters/controllers/GetRecyclingCenterByIdController');
 const authMiddleware = require('../../interface_adapters/middleware/AuthMiddleware');
 const adminAuthMiddleware = require('../../interface_adapters/middleware/AdminAuthMiddleware');
 
@@ -51,6 +53,8 @@ const deleteDisposalController = new DeleteDisposalController();
 const updateRecyclingCenterController = new UpdateRecyclingCenterController();
 const viewRecyclingCentersController = new ViewRecyclingCentersController();
 const searchRecyclingCentersController = new SearchRecyclingCentersController();
+const getRecyclingCentersByWasteTypeController = new GetRecyclingCentersByWasteTypeController();
+const getRecyclingCenterByIdController = new GetRecyclingCenterByIdController();
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -81,6 +85,8 @@ app.delete('/admin/recycling-centers/:id', adminAuthMiddleware, (req, res) => de
 
 // --- USER PROTECTED ROUTES ---
 app.get('/recycling-centers', authMiddleware, (req, res) => viewRecyclingCentersController.handle(req, res));
+app.get('/recycling-centers/by-waste/:wasteType', authMiddleware, (req, res) => getRecyclingCentersByWasteTypeController.handle(req, res));
+app.get('/recycling-centers/:id', authMiddleware, (req, res) => getRecyclingCenterByIdController.handle(req, res));
 app.post('/recycling-centers/search', authMiddleware, (req, res) => searchRecyclingCentersController.handle(req, res));
 
 // --- MANAGER PROTECTED ROUTES ---
