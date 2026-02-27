@@ -37,6 +37,12 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     return this.toEntity(mongoRecyclingCenter);
   }
 
+  async findById(id) {
+    const mongoRecyclingCenter = await RecyclingCenterModel.findById(id);
+    if (!mongoRecyclingCenter) return null;
+    return this.toEntity(mongoRecyclingCenter);
+  }
+
   async deleteById(id) {
     const deletedCenter = await RecyclingCenterModel.findByIdAndDelete(id);
     return Boolean(deletedCenter);
@@ -79,7 +85,11 @@ class MongoRecyclingCenterRepository extends RecyclingCenterRepository {
     const addressKeywords = Array.isArray(filters.addressKeywords) ? filters.addressKeywords : [];
 
     if (acceptedWasteTypes.length > 0) {
-      and.push({ acceptedWasteTypes: { $in: acceptedWasteTypes } });
+      and.push({
+        $or: acceptedWasteTypes.map((type) => ({
+          acceptedWasteTypes: { $elemMatch: { $regex: `^${this.escapeRegex(type)}$`, $options: 'i' } },
+        })),
+      });
     }
 
     if (filters.name) {

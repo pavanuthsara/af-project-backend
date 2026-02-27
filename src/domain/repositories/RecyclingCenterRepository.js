@@ -11,6 +11,10 @@ class RecyclingCenterRepository {
     throw new Error('Method not implemented: findByNameAndAddress');
   }
 
+  async findById(id) {
+    throw new Error('Method not implemented: findById');
+  }
+
   async deleteById(id) {
     throw new Error('Method not implemented: deleteById');
   }
