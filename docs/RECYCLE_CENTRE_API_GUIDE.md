@@ -64,6 +64,29 @@ Request body:
 }
 ```
 
+Current accepted waste type names in the system (from `GET /categories` on February 27, 2026):
+- `Hazardous Waste`
+- `Paper`
+- `solid waste`
+- `Plastics`
+
+Example using current category names:
+
+```json
+{
+  "name": "Green Valley Recycling Hub",
+  "address": "123 Main St, Springfield",
+  "location": {
+    "type": "Point",
+    "coordinates": [-73.935242, 40.73061]
+  },
+  "acceptedWasteTypes": ["Paper", "Plastics"],
+  "operatingHours": "Mon-Fri 08:00-18:00",
+  "maxCapacityKg": 50000,
+  "currentLoadKg": 1200
+}
+```
+
 Success response (`201`):
 
 ```json
