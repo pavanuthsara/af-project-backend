@@ -1,7 +1,8 @@
 class UpdateDisposalLog {
-  constructor(disposalActivityRepository, wasteItemRepository) {
+  constructor(disposalActivityRepository, wasteItemRepository, carbonService = null) {
     this.disposalActivityRepository = disposalActivityRepository;
     this.wasteItemRepository = wasteItemRepository;
+    this.carbonService = carbonService;
   }
 
   async execute(logId, userId, updates) {
@@ -46,6 +47,37 @@ class UpdateDisposalLog {
     if (updates.disposalGuideline !== undefined) {
       if (updates.disposalGuideline !== null && typeof updates.disposalGuideline !== 'string') {
         throw new Error('Disposal guideline must be a string or null');
+      }
+    }
+
+    // Recalculate CO₂ if weight, unit, or wasteId changed
+    const co2AffectingFields = ['weight', 'unit', 'wasteId'];
+    const needsRecalc = co2AffectingFields.some(f => updates[f] !== undefined);
+
+    if (needsRecalc && this.carbonService) {
+      // Use updated values or fall back to existing log values
+      const effectiveWasteId  = updates.wasteId || existingLog.wasteId;
+      const effectiveWeight   = updates.weight   !== undefined ? updates.weight   : existingLog.weight;
+      const effectiveUnit     = updates.unit     !== undefined ? updates.unit     : existingLog.unit;
+
+      const wasteItem = await this.wasteItemRepository.findByIdWithCategory
+        ? await this.wasteItemRepository.findByIdWithCategory(effectiveWasteId)
+        : await this.wasteItemRepository.findById(effectiveWasteId);
+
+      if (wasteItem) {
+        try {
+          const co2Result = await this.carbonService.estimateCO2(
+            wasteItem.categoryName || null,
+            wasteItem,
+            effectiveWeight,
+            effectiveUnit
+          );
+          updates.co2Saved       = co2Result.co2Saved;
+          updates.co2Source      = co2Result.source;
+          updates.disposalMethod = co2Result.disposalMethod;
+        } catch {
+          // Non-fatal – keep existing CO₂ values
+        }
       }
     }
 
