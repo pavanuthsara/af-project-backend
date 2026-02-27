@@ -18,6 +18,10 @@ class RecyclingCenterRepository {
   async updateById(id, data) {
     throw new Error('Method not implemented: updateById');
   }
+
+  async search(filters) {
+    throw new Error('Method not implemented: search');
+  }
 }
 
 module.exports = RecyclingCenterRepository;
