@@ -39,19 +39,23 @@ class AIController {
       if (wasteItem) {
         return res.status(200).json({
           success: true,
+          foundInDatabase: true,
           detectedLabel,
           confidence,
           disposalInstructions: wasteItem.disposalInstructions || 'No disposal instructions available',
           category: wasteItem.category
         });
-      } else {
-        return res.status(404).json({
-          success: false,
-          message: 'Item not found in database',
-          detectedLabel,
-          confidence
-        });
       }
+
+      return res.status(200).json({
+        success: true,
+        foundInDatabase: false,
+        message: 'Item not found in database',
+        detectedLabel,
+        confidence,
+        disposalInstructions: null,
+        category: null
+      });
     } catch (error) {
       if (req.file && fs.existsSync(req.file.path)) {
         fs.unlinkSync(req.file.path);
