@@ -1,0 +1,175 @@
+config:
+  target: "http://localhost:3000"
+
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm up"
+
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: "Ramp up load"
+
+    - duration: 120
+      arrivalRate: 50
+      name: "Sustained peak load"
+
+  # Default headers for all requests
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+  # Ensure Artillery doesn't treat 4xx as errors for auth flows
+  http:
+    timeout: 10
+
+scenarios:
+  # ──────────────────────────────────────────────
+  # Scenario 1: Public Browsing (No Auth Required)
+  # ──────────────────────────────────────────────
+  - name: "Public Browsing – Categories & Items"
+    weight: 30
+    flow:
+      # Fetch all waste categories
+      - get:
+          url: "/api/categories"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Fetch all waste items
+      - get:
+          url: "/api/items"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Fetch categories again (simulates back-navigation)
+      - get:
+          url: "/api/categories"
+          expect:
+            - statusCode: 200
+
+  # ──────────────────────────────────────────────
+  # Scenario 2: User Signup & Login Flow
+  # ──────────────────────────────────────────────
+  - name: "User Signup & Login"
+    weight: 20
+    flow:
+      # Sign up a new user
+      - post:
+          url: "/signup"
+          json:
+            name: "loadtest_{{ $randomString() }}"
+            email: "loadtest_{{ $randomString() }}@test.com"
+            password: "TestPassword123"
+          capture:
+            - json: "$.token"
+              as: "userToken"
+
+      - think: 1
+
+      # Log in with the same credentials
+      - post:
+          url: "/login"
+          json:
+            email: "damith@example.com"
+            password: "yourpassword"
+          capture:
+            - json: "$.token"
+              as: "userToken"
+
+  # ──────────────────────────────────────────────
+  # Scenario 3: Authenticated User Journey
+  # ──────────────────────────────────────────────
+  - name: "Authenticated User Journey"
+    weight: 50
+    flow:
+      # Step 1: Login to get JWT
+      - post:
+          url: "/login"
+          json:
+            email: "damith@example.com"
+            password: "yourpassword"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+
+      - think: 1
+
+      # Step 2: View profile
+      - get:
+          url: "/profile"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 3: View recycling centers
+      - get:
+          url: "/recycling-centers"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 4: Browse waste categories (public)
+      - get:
+          url: "/api/categories"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 5: Browse waste items (public)
+      - get:
+          url: "/api/items"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 6: View disposal history
+      - get:
+          url: "/disposal/history"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 7: View personal disposal stats
+      - get:
+          url: "/disposal/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 8: View available quizzes
+      - get:
+          url: "/api/quizzes"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+      - think: 1
+
+      # Step 9: View earned certificates
+      - get:
+          url: "/api/quizzes/certificates"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
