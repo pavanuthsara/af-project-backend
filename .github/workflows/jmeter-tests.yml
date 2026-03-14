@@ -45,7 +45,7 @@ jobs:
       # 7. RUN THE TEST: Executes JMeter in CLI (Non-GUI) mode and generates the report
       - name: Run JMeter Load Test
         run: |
-          ./apache-jmeter-5.6.3/bin/jmeter -n -t test-plan.jmx -l results.jtl -e -o jmeter-html-report
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t jmeter-tests.jmx -l results.jtl -e -o jmeter-html-report
 
       # 8. SAVE THE RESULTS: Zips up the HTML report so we can download it from GitHub later
       - name: Upload JMeter HTML Report
