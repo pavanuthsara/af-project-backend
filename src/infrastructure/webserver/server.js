@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const connectToDatabase = require('../database/mongoose');
 const SignUpController = require('../../interface_adapters/controllers/SignUpController');
 const LoginController = require('../../interface_adapters/controllers/LoginController');
@@ -31,11 +32,24 @@ const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
 // Import AI routes
 const aiRoutes = require('../../interface_adapters/routes/aiRoutes');
 
+// Allowed origins for CORS
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+
 // Load environment variables
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+
+// Configure CORS
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 
 // Instantiate Controllers
 const signUpController = new SignUpController();

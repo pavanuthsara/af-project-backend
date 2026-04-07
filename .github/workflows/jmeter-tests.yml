@@ -1,0 +1,55 @@
+name: JMeter CI/CD Load Test
+
+# 1. THE TRIGGER: This tells GitHub to run this script every time code is pushed.
+on:
+  pull_request:
+    branches: [staging, main]
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest # Runs on a fresh, temporary Linux server
+
+    steps:
+      # 2. GET THE CODE: Downloads your repository files to the temporary server
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 3. SETUP BACKEND: Installs Node.js so we can run our API
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Node Dependencies
+        run: npm install express
+
+      # 4. START THE API: Runs our server in the background (&) so the pipeline can continue
+      - name: Start Demo API Server
+        run: |
+          node server.js &
+          sleep 3 # Waits 3 seconds to ensure the server is fully booted up
+
+      # 5. SETUP JAVA: JMeter is a Java application, so we must install Java first
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      # 6. INSTALL JMETER: Downloads the latest version of JMeter directly from Apache
+      - name: Download and Install JMeter
+        run: |
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf apache-jmeter-5.6.3.tgz
+
+      # 7. RUN THE TEST: Executes JMeter in CLI (Non-GUI) mode and generates the report
+      - name: Run JMeter Load Test
+        run: |
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t jmeter-tests.jmx -l results.jtl -e -o jmeter-html-report
+
+      # 8. SAVE THE RESULTS: Zips up the HTML report so we can download it from GitHub later
+      - name: Upload JMeter HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: JMeter-Performance-Report
+          path: jmeter-html-report/
