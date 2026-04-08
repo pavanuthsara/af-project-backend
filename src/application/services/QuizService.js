@@ -106,6 +106,14 @@ class QuizService {
                 }
             },
             {
+                $lookup: {
+                    from: 'questions', // Mongoose automatically lowercase/pluralizes 'Question' to 'questions'
+                    localField: '_id',
+                    foreignField: 'quiz', // Matches the 'quiz' field in your QuestionSchema
+                    as: 'questions'       // Attaches the array as 'questions' for the frontend to use
+                }
+            },
+            {
                 $addFields: {
                     completed: { $gt: [{ $size: '$userAttempts' }, 0] },
                     lastAttempt: { $arrayElemAt: ['$userAttempts', 0] }
