@@ -33,7 +33,7 @@ const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
 const aiRoutes = require('../../interface_adapters/routes/aiRoutes');
 
 // Allowed origins for CORS
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = ['http://localhost:5173', 'https://se73-binwise.netlify.app/'];
 
 // Load environment variables
 require('dotenv').config();

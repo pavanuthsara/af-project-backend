@@ -4,23 +4,44 @@
 >
 > **Live URL:** [https://af-project-backend.onrender.com](https://af-project-backend.onrender.com)
 
+## Deployment Screenshots
+
+![alt text](image.png)
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
 ---
 
-## Table of Contents
+## Environment Variables
 
-1. [Deployment Overview](#1-deployment-overview)
-2. [Technology Stack](#2-technology-stack)
-3. [Render Service Configuration](#3-render-service-configuration)
-4. [Environment Variables](#4-environment-variables)
-5. [CI/CD Pipeline](#5-cicd-pipeline)
-6. [Database Configuration](#6-database-configuration)
-7. [API Endpoints Available in Production](#7-api-endpoints-available-in-production)
-8. [Post-Deployment Verification](#8-post-deployment-verification)
-9. [Troubleshooting](#9-troubleshooting)
+The following environment variables must be configured in the **Render Dashboard** under **Environment → Environment Variables**:
+
+| Variable            | Description                                       | Required |
+| ------------------- | ------------------------------------------------- | -------- |
+| `MONGO_URI`         | MongoDB Atlas connection string                   | ✅       |
+| `PORT`              | Server port (Render provides this automatically)  | ❌       |
+| `NODE_ENV`          | Set to `production` on Render                     | ✅       |
+| `JWT_SECRET`        | Secret key for signing JWT tokens                 | ✅       |
+| `GROK_API_KEY`      | Groq API key for translation & explanation services | ✅     |
+| `GEMINI_API_KEY`    | Google Generative AI key for AI identification    | ✅       |
+| `CLIMATIQ_API_KEY`  | Climatiq API key for carbon footprint data        | ✅       |
+
+> **⚠️ Important:** The `.env` file is listed in `.gitignore` and is **never** committed to the repository. All secrets must be set directly in the Render Dashboard.
+
+### Setting Environment Variables on Render
+
+1. Go to the [Render Dashboard](https://dashboard.render.com).
+2. Select the **af-project-backend** service.
+3. Navigate to **Environment** in the left sidebar.
+4. Click **Add Environment Variable** for each variable listed above.
+5. Click **Save Changes** — the service will redeploy automatically.
 
 ---
 
-## 1. Deployment Overview
+## Deployment Overview
 
 | Property           | Value                                              |
 | ------------------ | -------------------------------------------------- |
@@ -37,7 +58,7 @@ The application is deployed as a **Web Service** on Render with automatic deploy
 
 ---
 
-## 2. Technology Stack
+## Technology Stack
 
 | Component             | Technology           | Version  |
 | --------------------- | -------------------- | -------- |
@@ -55,7 +76,7 @@ The application is deployed as a **Web Service** on Render with automatic deploy
 
 ---
 
-## 3. Render Service Configuration
+## Render Service Configuration
 
 The service was configured via the **Render Dashboard** (no `render.yaml` or `Dockerfile` is used).
 
@@ -100,33 +121,7 @@ Service is LIVE at https://af-project-backend.onrender.com
 
 ---
 
-## 4. Environment Variables
-
-The following environment variables must be configured in the **Render Dashboard** under **Environment → Environment Variables**:
-
-| Variable            | Description                                       | Required |
-| ------------------- | ------------------------------------------------- | -------- |
-| `MONGO_URI`         | MongoDB Atlas connection string                   | ✅       |
-| `PORT`              | Server port (Render provides this automatically)  | ❌       |
-| `NODE_ENV`          | Set to `production` on Render                     | ✅       |
-| `JWT_SECRET`        | Secret key for signing JWT tokens                 | ✅       |
-| `GROK_API_KEY`      | Groq API key for translation & explanation services | ✅     |
-| `GEMINI_API_KEY`    | Google Generative AI key for AI identification    | ✅       |
-| `CLIMATIQ_API_KEY`  | Climatiq API key for carbon footprint data        | ✅       |
-
-> **⚠️ Important:** The `.env` file is listed in `.gitignore` and is **never** committed to the repository. All secrets must be set directly in the Render Dashboard.
-
-### Setting Environment Variables on Render
-
-1. Go to the [Render Dashboard](https://dashboard.render.com).
-2. Select the **af-project-backend** service.
-3. Navigate to **Environment** in the left sidebar.
-4. Click **Add Environment Variable** for each variable listed above.
-5. Click **Save Changes** — the service will redeploy automatically.
-
----
-
-## 5. CI/CD Pipeline
+## CI/CD Pipeline
 
 ### GitHub Actions Workflow
 
@@ -151,53 +146,7 @@ GitHub Actions: CI Build Check
 Render auto-deploys from main
 ```
 
-### CI Environment Secrets
-
-The following GitHub repository secrets must be configured for CI to pass:
-
-| Secret         | Purpose                                    |
-| -------------- | ------------------------------------------ |
-| `GROK_API_KEY` | Required by TranslationService tests       |
-
-Configure these in **GitHub → Repository → Settings → Secrets and variables → Actions**.
-
----
-
-## 6. Database Configuration
-
-### MongoDB Atlas
-
-The production database is hosted on **MongoDB Atlas** (free-tier M0 cluster).
-
-| Property         | Value                                                |
-| ---------------- | ---------------------------------------------------- |
-| **Provider**     | MongoDB Atlas                                        |
-| **Cluster**      | Cluster0                                             |
-| **Connection**   | `mongodb+srv://` SRV connection string               |
-| **Authentication** | Username and password                              |
-
-### Connection Flow
-
-```javascript
-// src/infrastructure/database/mongoose.js
-const connectToDatabase = async () => {
-  const uri = process.env.MONGO_URI;
-  await mongoose.connect(uri);
-};
-```
-
-The server calls `connectToDatabase()` during startup and will **exit with code 1** if the connection fails, signaling Render to mark the deploy as failed.
-
-### Network Access
-
-Ensure MongoDB Atlas allows connections from Render's IP addresses:
-
-1. Go to **MongoDB Atlas → Network Access**.
-2. Add `0.0.0.0/0` (allow from anywhere) or add Render's [static outbound IPs](https://docs.render.com/static-outbound-ip-addresses) if on a paid plan.
-
----
-
-## 7. API Endpoints Available in Production
+## API Endpoints Available in Production
 
 ### Public Endpoints
 
@@ -269,7 +218,7 @@ Ensure MongoDB Atlas allows connections from Render's IP addresses:
 
 ---
 
-## 8. Post-Deployment Verification
+## Post-Deployment Verification
 
 After every deployment, verify the service is running correctly:
 
@@ -284,16 +233,6 @@ curl https://af-project-backend.onrender.com/profile
 curl https://af-project-backend.onrender.com/api/categories
 ```
 
-### Full Verification Checklist
-
-- [ ] Server responds to HTTP requests at the live URL
-- [ ] `/signup` and `/login` endpoints return valid JWT tokens
-- [ ] Protected routes return `401` without a token
-- [ ] MongoDB connection is active (no startup errors in Render logs)
-- [ ] Quiz endpoints return quiz data for authenticated users
-- [ ] Waste category/item CRUD operations work correctly
-- [ ] AI identification endpoint responds with valid results
-
 ### Viewing Logs on Render
 
 1. Go to the [Render Dashboard](https://dashboard.render.com).
@@ -307,7 +246,7 @@ curl https://af-project-backend.onrender.com/api/categories
 
 ---
 
-## 9. Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -321,14 +260,6 @@ curl https://af-project-backend.onrender.com/api/categories
 | Translation / AI features not working | `GROK_API_KEY` or `GEMINI_API_KEY` not set    | Add API keys in Render Dashboard → Environment      |
 | MongoDB network error                | Atlas IP whitelist doesn't include Render IPs | Add `0.0.0.0/0` to Atlas Network Access             |
 
-### Redeploying
-
-```
-Render Dashboard → af-project-backend → Manual Deploy → Deploy latest commit
-```
-
-Or simply push a new commit to the `main` branch.
-
 ---
 
-> **Last Updated:** February 2026
+> **Last Updated:** April 2026
