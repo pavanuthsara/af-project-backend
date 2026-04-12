@@ -115,6 +115,24 @@ class QuizController {
         }
     };
 
+    /**
+     * GET /api/quizzes/:quizId/questions
+     * Admin-only: fetches all questions for a quiz including correctAnswer and explanation.
+     */
+    getQuestionsForAdmin = async (req, res, next) => {
+        try {
+            const { quizId } = req.params;
+            const result = await this.quizService.getQuestionsForAdmin(quizId);
+
+            res.status(200).json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
     // ─── User Endpoints ──────────────────────────────────────────
 
     /**

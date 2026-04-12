@@ -41,6 +41,16 @@ router.delete(
     quizController.deleteQuestion
 );
 
+// ─── Admin Routes (continued) ──────────────────────────────────
+
+// Get all questions for a quiz (admin-only, includes correctAnswer & explanation)
+router.get(
+    '/:quizId/questions',
+    authMiddleware,
+    authorize('admin'),
+    quizController.getQuestionsForAdmin
+);
+
 // ─── User Routes (require authentication) ──────────────────────
 
 // Get all quizzes with completion status

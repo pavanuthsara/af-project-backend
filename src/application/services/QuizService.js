@@ -45,21 +45,37 @@ class QuizService {
 
     /**
      * Update an existing question.
+     * Uses document.save() instead of findByIdAndUpdate so that the
+     * correctAnswer validator can access `this.options` correctly.
      */
     async updateQuestion(questionId, updateData) {
-        const question = await Question.findById(questionId);
+        const question = await Question.findById(questionId).select('+correctAnswer +explanation');
         if (!question) {
             const error = new Error('Question not found');
             error.statusCode = 404;
             throw error;
         }
 
-        const updatedQuestion = await Question.findByIdAndUpdate(
-            questionId,
-            updateData,
-            { new: true, runValidators: true }
-        );
-        return updatedQuestion;
+        // Apply each field from updateData onto the document
+        Object.assign(question, updateData);
+
+        // save() triggers Mongoose validators with proper `this` context
+        return await question.save();
+    }
+
+    /**
+     * Get all questions for a quiz for admin editing (includes correctAnswer & explanation).
+     */
+    async getQuestionsForAdmin(quizId) {
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            const error = new Error('Quiz not found');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const questions = await Question.find({ quiz: quizId }).select('+correctAnswer +explanation');
+        return { quiz, questions };
     }
 
     /**
