@@ -1,5 +1,6 @@
 const WasteCategory = require('../../interface_adapters/schemas/WasteCategory');
 const WasteItem = require('../../interface_adapters/schemas/WasteItem');
+const RecyclingCenter = require('../../interface_adapters/schemas/RecyclingCenterSchema');
 
 
 class WasteService {
@@ -9,7 +10,23 @@ class WasteService {
     return await category.save();
   }
 
-  async getCategories({ page = 1, limit = 10 }) {
+  async getCategories({ page = 1, limit = 10, paginate = true }) {
+    // When paginate=false, return all categories without pagination
+    if (paginate === false || paginate === 'false') {
+      const categories = await WasteCategory.find().sort({ name: 1 });
+      return {
+        categories,
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: categories.length,
+          itemsPerPage: categories.length,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    }
+
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
     
@@ -55,30 +72,51 @@ class WasteService {
       throw error;
     }
     
+    const oldName = category.name;
+
     // Perform update with runValidators to ensure data integrity
     const updatedCategory = await WasteCategory.findByIdAndUpdate(
       id,
       updateData,
       { new: true, runValidators: true }
     );
+
+    // Cascade: if name changed, update all RecyclingCenter documents that
+    // reference the old category name so stored waste types stay in sync
+    if (updateData.name && updatedCategory.name !== oldName) {
+      await RecyclingCenter.updateMany(
+        { acceptedWasteTypes: oldName },
+        { $set: { 'acceptedWasteTypes.$[elem]': updatedCategory.name } },
+        { arrayFilters: [{ elem: oldName }] }
+      );
+    }
     
     return updatedCategory;
   }
 
   
   async deleteCategory(id) {
-    // Delete all waste items associated with this category first
-    // This helps maintain referential integrity in case of errors
-    await WasteItem.deleteMany({ category: id });
-
-    // Then delete the category itself
-    const category = await WasteCategory.findByIdAndDelete(id);
+    // Check the category exists before attempting deletion
+    const category = await WasteCategory.findById(id);
     if (!category) {
       const error = new Error('Category not found');
       error.statusCode = 404;
       throw error;
     }
+
+    const oldName = category.name;
+
+    // Delete all waste items associated with this category
     await WasteItem.deleteMany({ category: id });
+
+    // Delete the category itself
+    await WasteCategory.findByIdAndDelete(id);
+
+    // Cascade: remove the deleted category name from all RecyclingCenter documents
+    await RecyclingCenter.updateMany(
+      { acceptedWasteTypes: oldName },
+      { $pull: { acceptedWasteTypes: oldName } }
+    );
     
     return category;
   }

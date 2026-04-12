@@ -1,10 +1,12 @@
 const WasteService = require('../../../src/application/services/WasteService');
 const WasteCategory = require('../../../src/interface_adapters/schemas/WasteCategory');
 const WasteItem = require('../../../src/interface_adapters/schemas/WasteItem');
+const RecyclingCenter = require('../../../src/interface_adapters/schemas/RecyclingCenterSchema');
 
 // Mock the schemas
 jest.mock('../../../src/interface_adapters/schemas/WasteCategory');
 jest.mock('../../../src/interface_adapters/schemas/WasteItem');
+jest.mock('../../../src/interface_adapters/schemas/RecyclingCenterSchema');
 
 describe('WasteService', () => {
   let wasteService;
@@ -85,6 +87,51 @@ describe('WasteService', () => {
         expect(result.pagination.hasPrevPage).toBe(true);
         expect(result.pagination.totalPages).toBe(3);
       });
+
+      test('should return ALL categories sorted by name when paginate=false', async () => {
+        const mockAllCategories = [
+          { _id: '1', name: 'E-waste' },
+          { _id: '2', name: 'Glass' },
+          { _id: '3', name: 'Plastic' },
+        ];
+
+        const mockQuery = {
+          sort: jest.fn().mockResolvedValue(mockAllCategories),
+        };
+
+        WasteCategory.find = jest.fn().mockReturnValue(mockQuery);
+
+        const result = await wasteService.getCategories({ paginate: false });
+
+        expect(WasteCategory.find).toHaveBeenCalledWith();
+        expect(mockQuery.sort).toHaveBeenCalledWith({ name: 1 });
+        // countDocuments must NOT be called — no pagination overhead
+        expect(WasteCategory.countDocuments).not.toHaveBeenCalled();
+        expect(result.categories).toEqual(mockAllCategories);
+        expect(result.pagination).toEqual({
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 3,
+          itemsPerPage: 3,
+          hasNextPage: false,
+          hasPrevPage: false,
+        });
+      });
+
+      test('should return all categories when paginate is the string "false"', async () => {
+        const mockAllCategories = [{ _id: '1', name: 'Plastic' }];
+
+        const mockQuery = {
+          sort: jest.fn().mockResolvedValue(mockAllCategories),
+        };
+
+        WasteCategory.find = jest.fn().mockReturnValue(mockQuery);
+
+        const result = await wasteService.getCategories({ paginate: 'false' });
+
+        expect(result.categories).toEqual(mockAllCategories);
+        expect(WasteCategory.countDocuments).not.toHaveBeenCalled();
+      });
     });
 
     describe('getCategoryById', () => {
@@ -118,10 +165,10 @@ describe('WasteService', () => {
     });
 
     describe('updateCategory', () => {
-      test('should successfully update category', async () => {
-        const updateData = { name: 'Updated Plastic' };
+      test('should successfully update category without name change (no cascade)', async () => {
+        const updateData = { description: 'Updated description' };
         const mockCategory = { _id: '123', name: 'Plastic' };
-        const updatedCategory = { _id: '123', name: 'Updated Plastic' };
+        const updatedCategory = { _id: '123', name: 'Plastic', description: 'Updated description' };
 
         WasteCategory.findById = jest.fn().mockResolvedValue(mockCategory);
         WasteCategory.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedCategory);
@@ -134,7 +181,42 @@ describe('WasteService', () => {
           updateData,
           { new: true, runValidators: true }
         );
+        // No name change — cascade must NOT be triggered
+        expect(RecyclingCenter.updateMany).not.toHaveBeenCalled();
         expect(result).toEqual(updatedCategory);
+      });
+
+      test('should cascade name change to RecyclingCenter documents', async () => {
+        const updateData = { name: 'Updated Plastic' };
+        const mockCategory = { _id: '123', name: 'Plastic' };
+        const updatedCategory = { _id: '123', name: 'Updated Plastic' };
+
+        WasteCategory.findById = jest.fn().mockResolvedValue(mockCategory);
+        WasteCategory.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedCategory);
+        RecyclingCenter.updateMany = jest.fn().mockResolvedValue({ modifiedCount: 2 });
+
+        const result = await wasteService.updateCategory('123', updateData);
+
+        // Cascade: old name replaced with new name in all RecyclingCenter docs
+        expect(RecyclingCenter.updateMany).toHaveBeenCalledWith(
+          { acceptedWasteTypes: 'Plastic' },
+          { $set: { 'acceptedWasteTypes.$[elem]': 'Updated Plastic' } },
+          { arrayFilters: [{ elem: 'Plastic' }] }
+        );
+        expect(result).toEqual(updatedCategory);
+      });
+
+      test('should NOT cascade when new name equals old name', async () => {
+        const updateData = { name: 'Plastic' }; // same name
+        const mockCategory = { _id: '123', name: 'Plastic' };
+        const updatedCategory = { _id: '123', name: 'Plastic' };
+
+        WasteCategory.findById = jest.fn().mockResolvedValue(mockCategory);
+        WasteCategory.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedCategory);
+
+        await wasteService.updateCategory('123', updateData);
+
+        expect(RecyclingCenter.updateMany).not.toHaveBeenCalled();
       });
 
       test('should throw 404 when updating non-existent category', async () => {
@@ -152,22 +234,8 @@ describe('WasteService', () => {
     });
 
     describe('deleteCategory', () => {
-      test('should delete category and associated items', async () => {
-        const mockCategory = { _id: '123', name: 'Plastic' };
-
-        WasteItem.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 5 });
-        WasteCategory.findByIdAndDelete = jest.fn().mockResolvedValue(mockCategory);
-
-        const result = await wasteService.deleteCategory('123');
-
-        expect(WasteItem.deleteMany).toHaveBeenCalledWith({ category: '123' });
-        expect(WasteCategory.findByIdAndDelete).toHaveBeenCalledWith('123');
-        expect(result).toEqual(mockCategory);
-      });
-
-      test('should throw 404 when deleting non-existent category', async () => {
-        WasteItem.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
-        WasteCategory.findByIdAndDelete = jest.fn().mockResolvedValue(null);
+      test('should throw 404 immediately when category does not exist (before any deletes)', async () => {
+        WasteCategory.findById = jest.fn().mockResolvedValue(null);
 
         await expect(wasteService.deleteCategory('nonexistent'))
           .rejects.toThrow('Category not found');
@@ -177,6 +245,36 @@ describe('WasteService', () => {
         } catch (error) {
           expect(error.statusCode).toBe(404);
         }
+
+        // Nothing should be deleted when the category is not found
+        expect(WasteItem.deleteMany).not.toHaveBeenCalled();
+        expect(WasteCategory.findByIdAndDelete).not.toHaveBeenCalled();
+        expect(RecyclingCenter.updateMany).not.toHaveBeenCalled();
+      });
+
+      test('should delete category, its items, and cascade-remove name from RecyclingCenters', async () => {
+        const mockCategory = { _id: '123', name: 'Plastic' };
+
+        WasteCategory.findById = jest.fn().mockResolvedValue(mockCategory);
+        WasteItem.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 5 });
+        WasteCategory.findByIdAndDelete = jest.fn().mockResolvedValue(mockCategory);
+        RecyclingCenter.updateMany = jest.fn().mockResolvedValue({ modifiedCount: 3 });
+
+        const result = await wasteService.deleteCategory('123');
+
+        // 1. Existence check
+        expect(WasteCategory.findById).toHaveBeenCalledWith('123');
+        // 2. Delete associated waste items
+        expect(WasteItem.deleteMany).toHaveBeenCalledWith({ category: '123' });
+        expect(WasteItem.deleteMany).toHaveBeenCalledTimes(1); // must NOT be called twice
+        // 3. Delete the category itself
+        expect(WasteCategory.findByIdAndDelete).toHaveBeenCalledWith('123');
+        // 4. Cascade: pull deleted name from RecyclingCenter.acceptedWasteTypes
+        expect(RecyclingCenter.updateMany).toHaveBeenCalledWith(
+          { acceptedWasteTypes: 'Plastic' },
+          { $pull: { acceptedWasteTypes: 'Plastic' } }
+        );
+        expect(result).toEqual(mockCategory);
       });
     });
   });

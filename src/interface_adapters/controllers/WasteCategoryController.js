@@ -40,12 +40,14 @@ class WasteCategoryController {
   getCategories = async (req, res, next) => {
     try {
       // Extract pagination parameters from query string
-      const { page, limit } = req.query;
+      // paginate=false returns all categories (used for validation dropdowns)
+      const { page, limit, paginate } = req.query;
       
-      // Get paginated categories from service
+      // Get categories from service (paginated or full list)
       const result = await this.wasteService.getCategories({ 
         page: parseInt(page) || 1, 
-        limit: parseInt(limit) || 10 
+        limit: parseInt(limit) || 10,
+        paginate: paginate === 'false' ? false : true,
       });
       
       // Return success response
