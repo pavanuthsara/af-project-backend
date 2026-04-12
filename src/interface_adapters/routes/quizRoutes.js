@@ -17,6 +17,14 @@ router.post(
     quizController.createQuiz
 );
 
+// Delete a quiz and all its questions
+router.delete(
+    '/:quizId',
+    authMiddleware,
+    authorize('admin'),
+    quizController.deleteQuiz
+);
+
 // Add a question to a quiz
 router.post(
     '/:quizId/questions',

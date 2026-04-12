@@ -29,6 +29,26 @@ class QuizService {
     }
 
     /**
+     * Delete a quiz and all of its questions.
+     */
+    async deleteQuiz(quizId) {
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            const error = new Error('Quiz not found');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // Remove all questions belonging to this quiz first
+        await Question.deleteMany({ quiz: quizId });
+
+        // Then remove the quiz itself
+        await Quiz.findByIdAndDelete(quizId);
+
+        return quiz;
+    }
+
+    /**
      * Add a question to an existing quiz.
      */
     async addQuestion(quizId, questionData) {

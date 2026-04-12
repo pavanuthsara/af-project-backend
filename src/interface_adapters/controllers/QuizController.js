@@ -45,6 +45,24 @@ class QuizController {
     };
 
     /**
+     * DELETE /api/quizzes/:quizId
+     * Deletes a quiz and all its associated questions.
+     */
+    deleteQuiz = async (req, res, next) => {
+        try {
+            const { quizId } = req.params;
+            await this.quizService.deleteQuiz(quizId);
+
+            res.status(200).json({
+                success: true,
+                message: 'Quiz and all its questions deleted successfully'
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
      * POST /api/quizzes/:quizId/questions
      * Adds a question to a specific quiz.
      */
