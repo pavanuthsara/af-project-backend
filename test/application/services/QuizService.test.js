@@ -100,31 +100,68 @@ describe('QuizService', () => {
     });
 
     describe('updateQuestion', () => {
-      test('should successfully update a question', async () => {
+      test('should successfully update a question using findById + save()', async () => {
         const questionId = 'question123';
-        const updateData = { text: 'Updated question text' };
-        const mockQuestion = { _id: questionId, text: 'Old text' };
-        const updatedQuestion = { _id: questionId, text: 'Updated question text' };
+        const updateData = { questionText: 'Updated question text', options: ['X', 'Y'], correctAnswer: 'X' };
 
-        Question.findById = jest.fn().mockResolvedValue(mockQuestion);
-        Question.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedQuestion);
+        // The document returned by findById — it has a save() method
+        const mockQuestion = {
+          _id: questionId,
+          questionText: 'Old text',
+          options: ['A', 'B'],
+          correctAnswer: 'A',
+          save: jest.fn().mockResolvedValue({
+            _id: questionId,
+            ...updateData
+          })
+        };
+
+        // select('+correctAnswer +explanation') is chained on findById
+        const mockSelectChain = { select: jest.fn().mockResolvedValue(mockQuestion) };
+        Question.findById = jest.fn().mockReturnValue(mockSelectChain);
 
         const result = await quizService.updateQuestion(questionId, updateData);
 
         expect(Question.findById).toHaveBeenCalledWith(questionId);
-        expect(Question.findByIdAndUpdate).toHaveBeenCalledWith(
-          questionId,
-          updateData,
-          { new: true, runValidators: true }
-        );
-        expect(result).toEqual(updatedQuestion);
+        expect(mockSelectChain.select).toHaveBeenCalledWith('+correctAnswer +explanation');
+        // Object.assign should have merged updateData onto the document
+        expect(mockQuestion.questionText).toBe('Updated question text');
+        expect(mockQuestion.options).toEqual(['X', 'Y']);
+        expect(mockQuestion.correctAnswer).toBe('X');
+        // save() should have been called (not findByIdAndUpdate)
+        expect(mockQuestion.save).toHaveBeenCalled();
+        expect(result).toEqual(expect.objectContaining({ _id: questionId }));
+      });
+
+      test('should apply partial updates without overwriting unrelated fields', async () => {
+        const questionId = 'question123';
+        const updateData = { questionText: 'Only the text changed' };
+
+        const mockQuestion = {
+          _id: questionId,
+          questionText: 'Original',
+          options: ['A', 'B'],
+          correctAnswer: 'A',
+          save: jest.fn().mockResolvedValue({ _id: questionId, questionText: 'Only the text changed', options: ['A', 'B'] })
+        };
+
+        const mockSelectChain = { select: jest.fn().mockResolvedValue(mockQuestion) };
+        Question.findById = jest.fn().mockReturnValue(mockSelectChain);
+
+        await quizService.updateQuestion(questionId, updateData);
+
+        expect(mockQuestion.questionText).toBe('Only the text changed');
+        // Other fields should be untouched
+        expect(mockQuestion.options).toEqual(['A', 'B']);
+        expect(mockQuestion.save).toHaveBeenCalled();
       });
 
       test('should throw 404 error when question not found', async () => {
         const questionId = 'nonexistent';
-        const updateData = { text: 'Updated text' };
+        const updateData = { questionText: 'Updated text' };
 
-        Question.findById = jest.fn().mockResolvedValue(null);
+        const mockSelectChain = { select: jest.fn().mockResolvedValue(null) };
+        Question.findById = jest.fn().mockReturnValue(mockSelectChain);
 
         await expect(quizService.updateQuestion(questionId, updateData))
           .rejects.toThrow('Question not found');
@@ -134,6 +171,26 @@ describe('QuizService', () => {
         } catch (error) {
           expect(error.statusCode).toBe(404);
         }
+      });
+
+      test('should propagate validation errors thrown by save()', async () => {
+        const questionId = 'question123';
+        const updateData = { correctAnswer: 'Z' }; // 'Z' not in options — validator would fail
+
+        const validationError = new Error('Validation failed: correctAnswer must be one of the options.');
+        const mockQuestion = {
+          _id: questionId,
+          questionText: 'Q?',
+          options: ['A', 'B'],
+          correctAnswer: 'A',
+          save: jest.fn().mockRejectedValue(validationError)
+        };
+
+        const mockSelectChain = { select: jest.fn().mockResolvedValue(mockQuestion) };
+        Question.findById = jest.fn().mockReturnValue(mockSelectChain);
+
+        await expect(quizService.updateQuestion(questionId, updateData))
+          .rejects.toThrow('correctAnswer must be one of the options.');
       });
     });
 
@@ -165,7 +222,166 @@ describe('QuizService', () => {
         }
       });
     });
-  });
+
+    describe('deleteQuiz', () => {
+      test('should delete the quiz and all its questions', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Recycling Basics', difficulty: 'Beginner' };
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        Question.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 3 });
+        Quiz.findByIdAndDelete = jest.fn().mockResolvedValue(mockQuiz);
+
+        const result = await quizService.deleteQuiz(quizId);
+
+        // Should look up the quiz first
+        expect(Quiz.findById).toHaveBeenCalledWith(quizId);
+        // Should cascade-delete all questions for this quiz
+        expect(Question.deleteMany).toHaveBeenCalledWith({ quiz: quizId });
+        // Should delete the quiz itself
+        expect(Quiz.findByIdAndDelete).toHaveBeenCalledWith(quizId);
+        // Should return the original quiz document
+        expect(result).toEqual(mockQuiz);
+      });
+
+      test('should delete questions before deleting the quiz (correct order)', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Order Test' };
+        const callOrder = [];
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        Question.deleteMany = jest.fn().mockImplementation(() => {
+          callOrder.push('deleteMany');
+          return Promise.resolve({ deletedCount: 2 });
+        });
+        Quiz.findByIdAndDelete = jest.fn().mockImplementation(() => {
+          callOrder.push('findByIdAndDelete');
+          return Promise.resolve(mockQuiz);
+        });
+
+        await quizService.deleteQuiz(quizId);
+
+        expect(callOrder).toEqual(['deleteMany', 'findByIdAndDelete']);
+      });
+
+      test('should delete quiz with zero questions without error', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Empty Quiz' };
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        Question.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
+        Quiz.findByIdAndDelete = jest.fn().mockResolvedValue(mockQuiz);
+
+        const result = await quizService.deleteQuiz(quizId);
+
+        expect(Question.deleteMany).toHaveBeenCalledWith({ quiz: quizId });
+        expect(result).toEqual(mockQuiz);
+      });
+
+      test('should throw 404 error when quiz not found', async () => {
+        const quizId = 'nonexistent';
+
+        Quiz.findById = jest.fn().mockResolvedValue(null);
+
+        await expect(quizService.deleteQuiz(quizId))
+          .rejects.toThrow('Quiz not found');
+
+        try {
+          await quizService.deleteQuiz(quizId);
+        } catch (error) {
+          expect(error.statusCode).toBe(404);
+        }
+      });
+
+      test('should not call deleteMany or findByIdAndDelete when quiz not found', async () => {
+        Quiz.findById = jest.fn().mockResolvedValue(null);
+        Question.deleteMany = jest.fn();
+        Quiz.findByIdAndDelete = jest.fn();
+
+        await expect(quizService.deleteQuiz('nonexistent')).rejects.toThrow();
+
+        expect(Question.deleteMany).not.toHaveBeenCalled();
+        expect(Quiz.findByIdAndDelete).not.toHaveBeenCalled();
+      });
+
+      test('should propagate DB errors from Question.deleteMany', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Quiz' };
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        Question.deleteMany = jest.fn().mockRejectedValue(new Error('DB connection lost'));
+        Quiz.findByIdAndDelete = jest.fn();
+
+        await expect(quizService.deleteQuiz(quizId))
+          .rejects.toThrow('DB connection lost');
+
+        // findByIdAndDelete should NOT be called if deleteMany failed
+        expect(Quiz.findByIdAndDelete).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('getQuestionsForAdmin', () => {
+      test('should return quiz and questions with correctAnswer and explanation selected', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Recycling Basics', difficulty: 'Beginner' };
+        const mockQuestions = [
+          { _id: VALID_QUESTION_ID_1, questionText: 'Q1?', options: ['A', 'B'], correctAnswer: 'A', explanation: 'Because A' },
+          { _id: VALID_QUESTION_ID_2, questionText: 'Q2?', options: ['X', 'Y'], correctAnswer: 'X', explanation: 'Because X' }
+        ];
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        // Question.find({ quiz }).select('+correctAnswer +explanation')
+        const mockSelectChain = { select: jest.fn().mockResolvedValue(mockQuestions) };
+        Question.find = jest.fn().mockReturnValue(mockSelectChain);
+
+        const result = await quizService.getQuestionsForAdmin(quizId);
+
+        expect(Quiz.findById).toHaveBeenCalledWith(quizId);
+        expect(Question.find).toHaveBeenCalledWith({ quiz: quizId });
+        expect(mockSelectChain.select).toHaveBeenCalledWith('+correctAnswer +explanation');
+        expect(result.quiz).toEqual(mockQuiz);
+        expect(result.questions).toHaveLength(2);
+        expect(result.questions[0].correctAnswer).toBe('A');
+        expect(result.questions[1].explanation).toBe('Because X');
+      });
+
+      test('should return empty questions array when quiz has no questions', async () => {
+        const quizId = VALID_QUIZ_ID;
+        const mockQuiz = { _id: quizId, title: 'Empty Quiz' };
+
+        Quiz.findById = jest.fn().mockResolvedValue(mockQuiz);
+        const mockSelectChain = { select: jest.fn().mockResolvedValue([]) };
+        Question.find = jest.fn().mockReturnValue(mockSelectChain);
+
+        const result = await quizService.getQuestionsForAdmin(quizId);
+
+        expect(result.quiz).toEqual(mockQuiz);
+        expect(result.questions).toEqual([]);
+      });
+
+      test('should throw 404 error when quiz not found', async () => {
+        Quiz.findById = jest.fn().mockResolvedValue(null);
+
+        await expect(quizService.getQuestionsForAdmin('nonexistent'))
+          .rejects.toThrow('Quiz not found');
+
+        try {
+          await quizService.getQuestionsForAdmin('nonexistent');
+        } catch (error) {
+          expect(error.statusCode).toBe(404);
+        }
+      });
+
+      test('should not call Question.find when quiz not found', async () => {
+        Quiz.findById = jest.fn().mockResolvedValue(null);
+        Question.find = jest.fn();
+
+        await expect(quizService.getQuestionsForAdmin('nonexistent')).rejects.toThrow();
+
+        expect(Question.find).not.toHaveBeenCalled();
+      });
+    });
+  }); // end Admin Methods
 
   describe('User Methods', () => {
     describe('getQuizzes', () => {
