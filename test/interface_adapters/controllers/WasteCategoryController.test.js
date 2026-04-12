@@ -145,7 +145,8 @@ describe('WasteCategoryController', () => {
 
       expect(mockWasteService.getCategories).toHaveBeenCalledWith({
         page: 1,
-        limit: 10
+        limit: 10,
+        paginate: true,
       });
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -175,7 +176,44 @@ describe('WasteCategoryController', () => {
 
       expect(mockWasteService.getCategories).toHaveBeenCalledWith({
         page: 1,
-        limit: 10
+        limit: 10,
+        paginate: true,
+      });
+    });
+
+    test('should forward paginate=false to service and return all categories', async () => {
+      const mockResult = {
+        categories: [
+          { _id: '1', name: 'E-waste' },
+          { _id: '2', name: 'Glass' },
+          { _id: '3', name: 'Plastic' },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 3,
+          itemsPerPage: 3,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+
+      mockReq.query = { paginate: 'false' };
+      mockWasteService.getCategories.mockResolvedValue(mockResult);
+
+      await controller.getCategories(mockReq, mockRes, mockNext);
+
+      // Controller must translate the string 'false' into boolean false
+      expect(mockWasteService.getCategories).toHaveBeenCalledWith({
+        page: 1,
+        limit: 10,
+        paginate: false,
+      });
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockResult.categories,
+        pagination: mockResult.pagination,
       });
     });
 
