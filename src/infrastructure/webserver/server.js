@@ -32,6 +32,9 @@ const quizRoutes = require('../../interface_adapters/routes/quizRoutes');
 // Import AI routes
 const aiRoutes = require('../../interface_adapters/routes/aiRoutes');
 
+// Keep-alive self-ping (prevents Render free-tier spin-down)
+const { startKeepAlive } = require('../keepAlive');
+
 // Allowed origins for CORS
 const allowedOrigins = ['http://localhost:5173', 'https://se73-binwise.netlify.app/'];
 
@@ -69,6 +72,15 @@ const viewRecyclingCentersController = new ViewRecyclingCentersController();
 const searchRecyclingCentersController = new SearchRecyclingCentersController();
 const getRecyclingCentersByWasteTypeController = new GetRecyclingCentersByWasteTypeController();
 const getRecyclingCenterByIdController = new GetRecyclingCenterByIdController();
+
+// --- HEALTH CHECK (public — required by self-ping & uptime monitors) ---
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // --- PUBLIC ROUTES ---
 app.post('/signup', (req, res) => signUpController.handle(req, res));
@@ -168,6 +180,8 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      // Start self-ping loop to prevent Render free-tier spin-down
+      startKeepAlive();
     });
   } catch (error) {
     console.error('Failed to start server:', error);
