@@ -45,6 +45,24 @@ class QuizController {
     };
 
     /**
+     * DELETE /api/quizzes/:quizId
+     * Deletes a quiz and all its associated questions.
+     */
+    deleteQuiz = async (req, res, next) => {
+        try {
+            const { quizId } = req.params;
+            await this.quizService.deleteQuiz(quizId);
+
+            res.status(200).json({
+                success: true,
+                message: 'Quiz and all its questions deleted successfully'
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
      * POST /api/quizzes/:quizId/questions
      * Adds a question to a specific quiz.
      */
@@ -109,6 +127,24 @@ class QuizController {
             res.status(200).json({
                 success: true,
                 message: 'Question deleted successfully'
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /**
+     * GET /api/quizzes/:quizId/questions
+     * Admin-only: fetches all questions for a quiz including correctAnswer and explanation.
+     */
+    getQuestionsForAdmin = async (req, res, next) => {
+        try {
+            const { quizId } = req.params;
+            const result = await this.quizService.getQuestionsForAdmin(quizId);
+
+            res.status(200).json({
+                success: true,
+                data: result
             });
         } catch (error) {
             next(error);

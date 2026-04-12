@@ -17,6 +17,14 @@ router.post(
     quizController.createQuiz
 );
 
+// Delete a quiz and all its questions
+router.delete(
+    '/:quizId',
+    authMiddleware,
+    authorize('admin'),
+    quizController.deleteQuiz
+);
+
 // Add a question to a quiz
 router.post(
     '/:quizId/questions',
@@ -39,6 +47,16 @@ router.delete(
     authMiddleware,
     authorize('admin'),
     quizController.deleteQuestion
+);
+
+// ─── Admin Routes (continued) ──────────────────────────────────
+
+// Get all questions for a quiz (admin-only, includes correctAnswer & explanation)
+router.get(
+    '/:quizId/questions',
+    authMiddleware,
+    authorize('admin'),
+    quizController.getQuestionsForAdmin
 );
 
 // ─── User Routes (require authentication) ──────────────────────
