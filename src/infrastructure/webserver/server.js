@@ -36,7 +36,7 @@ const aiRoutes = require('../../interface_adapters/routes/aiRoutes');
 const { startKeepAlive } = require('../keepAlive');
 
 // Allowed origins for CORS
-const allowedOrigins = ['http://localhost:5173', 'https://se73-binwise.netlify.app/'];
+const allowedOrigins = ['http://localhost:5173', 'https://se73-binwise.netlify.app'];
 
 // Load environment variables
 require('dotenv').config();
