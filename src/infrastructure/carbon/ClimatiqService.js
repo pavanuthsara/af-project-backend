@@ -55,11 +55,49 @@ class ClimatiqService {
     return 'default';
   }
 
-  /** Derives the disposal method from the waste item's flags. */
-  _getDisposalMethod(wasteItem) {
-    if (wasteItem.recyclable)  return 'recycled';
-    if (wasteItem.compostable) return 'composted';
-    return 'landfill';
+  /** Derives the disposal method from the waste item's flags and category. */
+  _getDisposalMethod(wasteItem, categoryName) {
+    // Check explicit properties first
+    if (wasteItem && wasteItem.recyclable)  return 'recycled';
+    if (wasteItem && wasteItem.compostable) return 'composted';
+    
+    // If not explicitly set, infer from category name
+    const category = (categoryName || '').toLowerCase().trim();
+    
+    // Debug log
+    if (!category) {
+      console.log('[ClimatiqService] No category name provided, defaulting to landfill');
+      return 'landfill';
+    }
+    
+    // Most items can be recycled
+    if (category.includes('plastic') || category.includes('metal') || 
+        category.includes('glass') || category.includes('paper') || 
+        category.includes('aluminum') || category.includes('electronic') ||
+        category.includes('e-waste') || category.includes('steel') ||
+        category.includes('tin') || category.includes('aluminum foil') ||
+        category.includes('cardboard') || category.includes('wood')) {
+      console.log(`[ClimatiqService] Category "${category}" → recycled`);
+      return 'recycled';
+    }
+    
+    // Organic waste should be composted
+    if (category.includes('organic') || category.includes('food') || 
+        category.includes('compost') || category.includes('yard') ||
+        category.includes('waste') && (category.includes('food') || category.includes('organic'))) {
+      console.log(`[ClimatiqService] Category "${category}" → composted`);
+      return 'composted';
+    }
+    
+    // If the item is explicitly hazardous it goes to special/landfill disposal
+    if (wasteItem && wasteItem.hazardous) {
+      console.log(`[ClimatiqService] Category "${category}" is hazardous, defaulting to landfill`);
+      return 'landfill';
+    }
+
+    // Unknown category but not hazardous — assume recycling (user is logging eco-friendly disposal)
+    console.log(`[ClimatiqService] Category "${category}" didn't match patterns, defaulting to recycled`);
+    return 'recycled';
   }
 
   /** Converts weight to kg. */
@@ -133,7 +171,7 @@ class ClimatiqService {
   async estimateCO2(categoryName, wasteItem, weight, unit) {
     const weightKg     = parseFloat(this._toKg(weight, unit).toFixed(4));
     const materialKey  = this._normaliseCategoryName(categoryName);
-    const disposalMethod = this._getDisposalMethod(wasteItem);
+    const disposalMethod = this._getDisposalMethod(wasteItem, categoryName);
 
     let co2Saved = null;
     let source   = 'epa_warm';
