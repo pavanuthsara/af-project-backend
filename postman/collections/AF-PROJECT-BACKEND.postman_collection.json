@@ -1,0 +1,650 @@
+{
+  "info": {
+    "_postman_id": "dcfa4490-3af2-4a85-b670-0c6cd961b3b7",
+    "name": "AF-PROJECT-BACKEND",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "profile",
+          "id": "b788c07c-f856-4651-a960-302fe27002ca",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User signup",
+          "id": "6dc69db9-4d30-42a1-90e2-030f44d36847",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"pavan\",\r\n    \"email\": \"pavan@gmail.com\",\r\n    \"password\": \"123\"    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User login",
+          "id": "6724dfeb-5fa0-4ab8-8123-0da6bb3b3f55",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"pavan@gmail.com\",\r\n    \"password\": \"123\"    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "f621a402-1a49-496d-8b89-8d2e43b5e1f3"
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "admin signup",
+          "id": "4f096ed8-fb82-4c22-b153-30b3aa948ebb",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Super Admin\",\r\n  \"email\": \"admin1@gmail.com\",\r\n  \"password\": \"123\",\r\n  \"role\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "admin login",
+          "id": "9d101f9f-6a19-4140-8992-910dfebeafea",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"admin1@gmail.com\",\r\n  \"password\": \"123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/admin/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "admin",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create new admins",
+          "id": "005e55b4-9f48-4a4f-b6ba-707d923278fe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "7c10c5c1-612f-415a-ad8f-c9c5c9612f30"
+    },
+    {
+      "name": "Quiz",
+      "item": [
+        {
+          "name": "Create quiz - Admin",
+          "id": "493bff9e-7938-4f37-b728-c5008ab88772",
+          "request": {
+            "auth": {
+              "type": "jwt",
+              "jwt": [
+                {
+                  "key": "algorithm",
+                  "value": "HS256",
+                  "type": "string"
+                },
+                {
+                  "key": "isSecretBase64Encoded",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "payload",
+                  "value": "{}",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "headerPrefix",
+                  "value": "Bearer",
+                  "type": "string"
+                },
+                {
+                  "key": "queryParamKey",
+                  "value": "token",
+                  "type": "string"
+                },
+                {
+                  "key": "header",
+                  "value": "{}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Plastic Sorting 101\",\r\n  \"description\": \"Learn to identify and sort different plastic types correctly\",\r\n  \"difficulty\": \"Beginner\",\r\n  \"passingScore\": 60\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add questions to quiz - Admin",
+          "id": "b98f5775-b44c-4b8e-a78b-5a65d2ca43e7",
+          "request": {
+            "auth": {
+              "type": "jwt",
+              "jwt": [
+                {
+                  "key": "algorithm",
+                  "value": "HS256",
+                  "type": "string"
+                },
+                {
+                  "key": "isSecretBase64Encoded",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "payload",
+                  "value": "{}",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "headerPrefix",
+                  "value": "Bearer",
+                  "type": "string"
+                },
+                {
+                  "key": "queryParamKey",
+                  "value": "token",
+                  "type": "string"
+                },
+                {
+                  "key": "header",
+                  "value": "{}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"questionText\": \"test question 1\",\r\n  \"options\": [\"Option 1\", \"Option 2\"],\r\n  \"correctAnswer\": \"Option 2\",\r\n  \"explanation\": \"Sample explanation\",\r\n  \"imageUrl\": null\r\n}\r\n\r\n// {\r\n//   \"questionText\": \"Which bin should a PET plastic bottle go in?\",\r\n//   \"options\": [\"Blue (Recyclable)\", \"Green (Organic)\", \"Red (Hazardous)\", \"General Waste\"],\r\n//   \"correctAnswer\": \"Blue (Recyclable)\",\r\n//   \"explanation\": \"PET bottles are 100% recyclable and should go in the blue bin.\",\r\n//   \"imageUrl\": null\r\n// }\r\n\r\n// {\r\n//   \"questionText\": \"Is a greasy pizza box recyclable?\",\r\n//   \"options\": [\"Yes\", \"No\"],\r\n//   \"correctAnswer\": \"No\",\r\n//   \"explanation\": \"Grease contaminates the paper fibers, making the box non-recyclable. Compost it instead!\",\r\n//   \"imageUrl\": null\r\n// }\r\n\r\n// {\r\n//   \"questionText\": \"Where should used batteries be disposed?\",\r\n//   \"options\": [\"Blue (Recyclable)\", \"Green (Organic)\", \"Red (Hazardous)\"],\r\n//   \"correctAnswer\": \"Red (Hazardous)\",\r\n//   \"explanation\": \"Batteries contain toxic chemicals and must go in the red hazardous waste bin.\",\r\n//   \"imageUrl\": null\r\n// }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/699e63374b9680f4b6793b67/questions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "699e63374b9680f4b6793b67",
+                "questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update quiz - Admin",
+          "id": "6daea4e6-2964-4630-9e03-dfc804a30b40",
+          "request": {
+            "auth": {
+              "type": "jwt",
+              "jwt": [
+                {
+                  "key": "algorithm",
+                  "value": "HS256",
+                  "type": "string"
+                },
+                {
+                  "key": "isSecretBase64Encoded",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "payload",
+                  "value": "{}",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "headerPrefix",
+                  "value": "Bearer",
+                  "type": "string"
+                },
+                {
+                  "key": "queryParamKey",
+                  "value": "token",
+                  "type": "string"
+                },
+                {
+                  "key": "header",
+                  "value": "{}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"questionText\": \"Update question text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/questions/699e63374b9680f4b6793b67",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "questions",
+                "699e63374b9680f4b6793b67"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete quiz - Admin",
+          "id": "db7ff4f5-8495-46b8-a9f1-88899259a388",
+          "request": {
+            "auth": {
+              "type": "jwt",
+              "jwt": [
+                {
+                  "key": "algorithm",
+                  "value": "HS256",
+                  "type": "string"
+                },
+                {
+                  "key": "isSecretBase64Encoded",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "payload",
+                  "value": "{}",
+                  "type": "string"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "headerPrefix",
+                  "value": "Bearer",
+                  "type": "string"
+                },
+                {
+                  "key": "queryParamKey",
+                  "value": "token",
+                  "type": "string"
+                },
+                {
+                  "key": "header",
+                  "value": "{}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"questionText\": \"Update question text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/questions/699e6a154b9680f4b6793b79",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "questions",
+                "699e6a154b9680f4b6793b79"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List quizzes - User",
+          "id": "28b18b1e-fbf2-4cfb-8aeb-ffbe1e32d146",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "description": "Admin",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWU2YWM2NGI5NjgwZjRiNjc5M2I3ZiIsImVtYWlsIjoicGF2YW5AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzE5ODk3MDYsImV4cCI6MTc3MTk5MzMwNn0.1wIOzYeENEox0xRD7I6Em31VGYplWOY5ObBr5-96IrI",
+                "description": "User",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Play a quiz - User",
+          "id": "cce9d6f6-3390-4978-bacb-3e8ab5320c56",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "description": "Admin",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWU2YWM2NGI5NjgwZjRiNjc5M2I3ZiIsImVtYWlsIjoicGF2YW5AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzE5ODk3MDYsImV4cCI6MTc3MTk5MzMwNn0.1wIOzYeENEox0xRD7I6Em31VGYplWOY5ObBr5-96IrI",
+                "description": "User",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/699e6ac64b9680f4b6793b7f/play",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "699e6ac64b9680f4b6793b7f",
+                "play"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit answers - User",
+          "id": "dc291149-a944-4649-8400-e9c0f9988721",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "description": "Admin",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWU2YWM2NGI5NjgwZjRiNjc5M2I3ZiIsImVtYWlsIjoicGF2YW5AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzE5OTc1NjgsImV4cCI6MTc3MjAwMTE2OH0.ullFncVaFK_lHHFEYB6FCGZpBLzQlkSOPQRLM4lLzLc",
+                "description": "User",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"answers\": [\r\n    { \"questionId\": \"699e660e4b9680f4b6793b6a\", \"selectedOption\": \"Blue (Recyclable)\" },\r\n    { \"questionId\": \"699e663a4b9680f4b6793b6d\", \"selectedOption\": \"Yes\" },\r\n    { \"questionId\": \"699e66524b9680f4b6793b70\", \"selectedOption\": \"Red (Hazardous)\" },\r\n    { \"questionId\": \"699e66fe4b9680f4b6793b73\", \"selectedOption\": \"Option 2\" }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/699e63374b9680f4b6793b67/submit",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "699e63374b9680f4b6793b67",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Certificates - User",
+          "id": "f19f2501-01d0-4163-8b36-782571dbf0bc",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OTNjNjI2NjEwZTc2NTcxMTI2MDgxYyIsImVtYWlsIjoiYWRtaW4xQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTk4NzYxMSwiZXhwIjoxNzcxOTkxMjExfQ.65Ef-D-HYcBWFc-uthsQLgi_roaXCOWAMw2EqsgISuI",
+                "description": "Admin",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5OWU2YWM2NGI5NjgwZjRiNjc5M2I3ZiIsImVtYWlsIjoicGF2YW5AZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NzE5OTc1NjgsImV4cCI6MTc3MjAwMTE2OH0.ullFncVaFK_lHHFEYB6FCGZpBLzQlkSOPQRLM4lLzLc",
+                "description": "User",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"answers\": [\r\n    { \"questionId\": \"699e660e4b9680f4b6793b6a\", \"selectedOption\": \"Blue (Recyclable)\" },\r\n    { \"questionId\": \"699e663a4b9680f4b6793b6d\", \"selectedOption\": \"Yes\" },\r\n    { \"questionId\": \"699e66524b9680f4b6793b70\", \"selectedOption\": \"Red (Hazardous)\" },\r\n    { \"questionId\": \"699e66fe4b9680f4b6793b73\", \"selectedOption\": \"Option 2\" }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/quizzes/699e63374b9680f4b6793b67/submit",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "quizzes",
+                "699e63374b9680f4b6793b67",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "379ed9f8-fd3f-4962-b76e-8c771fccfeba"
+    }
+  ]
+}
